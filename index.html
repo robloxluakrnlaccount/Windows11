@@ -2,33 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Windows 11">
+<meta name="theme-color" content="#141418">
 <title>Windows 11</title>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="Arcade Hub"/>
 <style>
 @font-face {
   font-family: 'Segoe Fluent Icons';
   src: url('https://raw.githubusercontent.com/Smart-Space/TinUI/main/Segoe%20Fluent%20Icons.ttf') format('truetype');
 }
 @font-face {
-  font-family: 'Segoe UI Light';
-  src: url('https://raw.githubusercontent.com/lrqdo/osm-bright.tm2/master/fonts/Segoe%20UI-Light.ttf') format('truetype');
-  font-weight: 300;
+  font-family: 'Segoe UI VF';
+  src: url('https://raw.githubusercontent.com/robloxluakrnlaccount/Windows11/main/SegoeUIVF.ttf') format('truetype');
+  font-weight: 100 900;
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html, body {
   width: 100%; height: 100%;
   overflow: hidden;
-  font-family: 'Segoe UI', 'Segoe UI Light', system-ui, sans-serif;
+  font-family: 'Segoe UI VF', system-ui, sans-serif;
   background: #000;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
-/* Only non-input elements are unselectable */
-body * { user-select: none; }
-input, textarea { user-select: text; }
+body * { user-select: none; -webkit-user-select: none; }
+input, textarea { user-select: text; -webkit-user-select: text; touch-action: auto; }
 
 /* ── Desktop ── */
 #desktop {
@@ -47,261 +48,118 @@ input, textarea { user-select: text; }
   display: flex; align-items: center;
   z-index: 10000;
   padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
-
-/* Left: Windows button */
-.tb-left {
-  display: flex; align-items: center; gap: 2px;
-  flex-shrink: 0;
-}
-
+.tb-left { display: flex; align-items: center; flex-shrink: 0; }
 .tb-win-btn {
   width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 6px; cursor: pointer;
-  transition: background 0.1s;
-  flex-shrink: 0;
+  border-radius: 6px; cursor: default; flex-shrink: 0;
+  opacity: 0.9;
 }
-.tb-win-btn:hover { background: rgba(255,255,255,0.1); }
-.tb-win-btn:active { background: rgba(255,255,255,0.15); }
 .tb-win-btn svg { width: 18px; height: 18px; }
 
-/* Center: open windows */
 .tb-center {
-  flex: 1;
-  display: flex; align-items: center;
-  justify-content: center;
-  gap: 2px;
-  overflow: hidden;
-  padding: 0 8px;
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 2px; overflow: hidden; padding: 0 8px;
 }
 
 /* Taskbar app pill */
 .tb-app {
   display: flex; align-items: center; justify-content: center;
-  height: 40px;
-  min-width: 40px; max-width: 160px;
-  padding: 0 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.1s;
-  gap: 6px;
-  flex-shrink: 0;
+  height: 40px; min-width: 40px; max-width: 160px;
+  padding: 0 10px; border-radius: 6px; cursor: pointer;
+  position: relative; transition: background 0.1s; gap: 6px; flex-shrink: 0;
 }
 .tb-app:hover { background: rgba(255,255,255,0.12); }
 .tb-app.active { background: rgba(255,255,255,0.18); }
 .tb-app.minimized { background: rgba(255,255,255,0.07); }
-
 .tb-app-icon {
   font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 16px; color: #fff; line-height: 1;
-  flex-shrink: 0;
+  font-size: 16px; color: #fff; line-height: 1; flex-shrink: 0;
 }
 .tb-app-title {
   font-size: 11.5px; color: rgba(255,255,255,0.88);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 100px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
 }
-
-/* Underline indicator */
 .tb-app::after {
-  content: '';
-  position: absolute;
+  content: ''; position: absolute;
   bottom: 4px; left: 50%; transform: translateX(-50%);
-  height: 3px; border-radius: 2px;
-  background: #60cdff;
-  transition: width 0.15s;
-  width: 0;
+  height: 3px; border-radius: 2px; background: #60cdff;
+  transition: width 0.15s; width: 0;
 }
 .tb-app.active::after { width: 16px; }
 .tb-app.minimized::after { width: 6px; background: rgba(255,255,255,0.5); }
 
-/* + New window button */
 #tb-new-btn {
   width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 6px; cursor: pointer;
-  color: rgba(255,255,255,0.6);
-  font-size: 20px; font-weight: 300; line-height: 1;
-  transition: background 0.1s, color 0.1s;
-  flex-shrink: 0;
+  color: rgba(255,255,255,0.6); font-size: 20px; font-weight: 300; line-height: 1;
+  transition: background 0.1s, color 0.1s; flex-shrink: 0;
 }
 #tb-new-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 #tb-new-btn:active { background: rgba(255,255,255,0.16); }
 
-/* Right: system tray */
-.tb-right {
-  display: flex; align-items: center; gap: 0;
-  flex-shrink: 0; margin-left: auto;
-}
-
+.tb-right { display: flex; align-items: center; flex-shrink: 0; margin-left: auto; }
 .tray-icon {
   width: 32px; height: 40px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 4px; cursor: pointer;
-  transition: background 0.1s;
+  border-radius: 4px; cursor: pointer; transition: background 0.1s;
 }
 .tray-icon:hover { background: rgba(255,255,255,0.1); }
-.tray-icon span {
-  font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 13px; color: rgba(255,255,255,0.88); line-height: 1;
-}
-
+.tray-icon span { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 11px; color: rgba(255,255,255,0.92); line-height: 1; }
 .tray-clock {
-  display: flex; flex-direction: column; align-items: flex-end;
-  justify-content: center;
-  padding: 0 8px 0 6px; height: 40px;
-  cursor: pointer; border-radius: 4px;
-  transition: background 0.1s;
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+  padding: 0 10px 0 6px; height: 40px; cursor: pointer; border-radius: 4px; transition: background 0.1s;
 }
 .tray-clock:hover { background: rgba(255,255,255,0.1); }
 .tray-time { font-size: 12px; color: rgba(255,255,255,0.92); line-height: 1.4; }
 .tray-date { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.4; }
 
-/* ── Picker app styles (inside window iframe content) ── */
-.papp {
-  width: 100%; height: 100%;
-  background: #f3f3f3;
-  display: flex; flex-direction: column;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  overflow: hidden;
-}
-.papp-body {
-  flex: 1; padding: 24px 28px;
-  display: flex; flex-direction: column; gap: 18px;
-  overflow-y: auto;
-}
-.papp-heading {
-  font-size: 20px; font-weight: 300; color: #1a1a1a;
-  font-family: 'Segoe UI Light', 'Segoe UI', sans-serif;
-}
-.papp-tabs {
-  display: flex; gap: 0;
-  border-bottom: 1px solid #d0d0d0;
-}
-.papp-tab {
-  padding: 8px 20px; font-size: 13px; color: #555;
-  cursor: pointer; border-bottom: 2px solid transparent;
-  margin-bottom: -1px; transition: color 0.1s, border-color 0.1s;
-  user-select: none;
-}
-.papp-tab:hover { color: #111; }
-.papp-tab.active { color: #0078d4; border-bottom-color: #0078d4; font-weight: 600; }
-.papp-section { display: none; flex-direction: column; gap: 12px; }
-.papp-section.active { display: flex; }
-.papp-label { font-size: 12px; color: #666; }
-.papp-filezone {
-  border: 2px dashed #c0c0c0; border-radius: 8px;
-  padding: 28px 20px; text-align: center;
-  cursor: pointer; transition: border-color 0.15s, background 0.15s;
-  background: #fff; position: relative;
-}
-.papp-filezone:hover { border-color: #0078d4; background: #f0f7ff; }
-.papp-filezone.dragover { border-color: #0078d4; background: #e5f1ff; }
-.papp-filezone-ico {
-  font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 32px; color: #0078d4; display: block; margin-bottom: 8px;
-}
-.papp-filezone-text { font-size: 13px; color: #444; }
-.papp-filezone-sub { font-size: 11px; color: #888; margin-top: 4px; }
-.papp-filezone input[type=file] {
-  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-}
-.papp-selected {
-  display: none; align-items: center; gap: 10px;
-  background: #fff; border: 1px solid #d0d0d0;
-  border-radius: 6px; padding: 10px 14px;
-}
-.papp-selected.show { display: flex; }
-.papp-selected-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 20px; color: #0078d4; }
-.papp-selected-name { font-size: 13px; color: #111; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.papp-selected-clear { font-size: 11px; color: #888; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
-.papp-selected-clear:hover { background: #eee; color: #c42b1c; }
-.papp-urlinput {
-  border: 1px solid #c0c0c0; border-radius: 6px;
-  padding: 9px 12px; font-size: 13px; color: #111;
-  outline: none; width: 100%;
-  font-family: 'Segoe UI', sans-serif;
-  transition: border-color 0.1s;
-}
-.papp-urlinput:focus { border-color: #0078d4; box-shadow: 0 0 0 2px rgba(0,120,212,0.15); }
-.papp-footer {
-  padding: 12px 28px 16px;
-  border-top: 1px solid #ddd;
-  display: flex; justify-content: flex-end; gap: 8px;
-  background: #f3f3f3;
-}
-.papp-btn {
-  padding: 6px 22px; border-radius: 4px; font-size: 13px;
-  border: 1px solid transparent; cursor: pointer;
-  font-family: 'Segoe UI', sans-serif;
-  transition: background 0.1s;
-}
-.papp-btn.cancel { background: #fff; border-color: #c0c0c0; color: #111; }
-.papp-btn.cancel:hover { background: #f0f0f0; }
-.papp-btn.open { background: #0078d4; color: #fff; border-color: #0078d4; }
-.papp-btn.open:hover { background: #106ebe; }
-.picker-btn.cancel {
-  background: rgba(255,255,255,0.1); color: #fff;
-}
-.picker-btn.cancel:hover { background: rgba(255,255,255,0.16); }
-.picker-btn.open {
-  background: #0078d4; color: #fff;
-}
-.picker-btn.open:hover { background: #1a8fe8; }
-
 /* ── Windows ── */
 .win11-window {
   position: fixed;
-  min-width: 320px; min-height: 200px;
+  min-width: 300px; min-height: 180px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.14), 0 8px 32px rgba(0,0,0,0.34), 0 32px 64px rgba(0,0,0,0.22);
   display: flex; flex-direction: column;
   overflow: visible;
   z-index: 1000;
+  /* Size/position transitions driven by JS */
 }
 .win11-window.focused { z-index: 1001; }
-.win11-window.hidden { display: none; }
+.win11-window.hidden { display: none !important; }
+
+/* Maximized: square corner on close btn */
+.win11-window.maximized .wbtn:last-child { border-radius: 0 !important; }
 
 /* ── Titlebar ── */
 .titlebar {
-  height: 32px; min-height: 32px;
-  background: #f3f3f3;
-  display: flex; align-items: center;
-  cursor: default;
-  border-bottom: 1px solid #e0e0e0;
-  border-radius: 8px 8px 0 0;
-  position: relative; z-index: 10;
-  overflow: visible; flex-shrink: 0;
+  height: 32px; min-height: 32px; background: #f3f3f3;
+  display: flex; align-items: center; cursor: default;
+  border-bottom: 1px solid #e0e0e0; border-radius: 8px 8px 0 0;
+  position: relative; z-index: 10; overflow: visible; flex-shrink: 0;
 }
 .tb-app-ico {
-  font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 14px; color: #005fb8;
-  margin-left: 8px; margin-right: 2px;
-  flex-shrink: 0; line-height: 1; pointer-events: none;
+  font-family: 'Segoe Fluent Icons', sans-serif; font-size: 14px; color: #005fb8;
+  margin-left: 8px; margin-right: 2px; flex-shrink: 0; line-height: 1; pointer-events: none;
 }
 .tb-title-text {
   font-size: 12px; color: #1a1a1a; font-weight: 400;
   flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   padding: 0 8px; line-height: 32px; pointer-events: none;
 }
-
-/* Window control buttons */
 .wctrl { display: flex; align-items: stretch; height: 32px; flex-shrink: 0; margin-left: auto; position: relative; overflow: visible; }
 .wbtn {
   width: 46px; height: 32px;
   display: flex; align-items: center; justify-content: center;
   background: transparent; border: none; cursor: pointer;
-  position: relative; overflow: visible; flex-shrink: 0;
-  transition: background 0.06s;
+  position: relative; overflow: visible; flex-shrink: 0; transition: background 0.06s;
 }
 .wbtn:last-child { border-radius: 0 8px 0 0; }
-.wbtn-ico {
-  font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 10px; color: #1a1a1a; line-height: 1; pointer-events: none;
-}
+.wbtn-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 10px; color: #1a1a1a; line-height: 1; pointer-events: none; }
 .wbtn:hover { background: rgba(0,0,0,0.08); }
 .wbtn:active { background: rgba(0,0,0,0.14); }
 .wbtn.wclose:hover { background: #c42b1c; }
@@ -310,29 +168,20 @@ input, textarea { user-select: text; }
 
 /* ── Snap flyout ── */
 .snap-flyout {
-  position: absolute; top: 100%; right: -8px;
-  width: 300px;
-  background: #1f1f1f;
-  border: 1px solid #3a3a3a;
-  border-radius: 8px;
-  padding: 14px 12px 12px;
+  position: absolute; top: 100%; right: -8px; width: 300px;
+  background: #1f1f1f; border: 1px solid #3a3a3a; border-radius: 8px;
+  padding: 10px 10px 10px;
   box-shadow: 0 16px 48px rgba(0,0,0,0.55);
-  z-index: 99999;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(-6px) scale(0.97);
-  transform-origin: top right;
+  z-index: 99999; pointer-events: none; opacity: 0;
+  transform: translateY(-6px) scale(0.97); transform-origin: top right;
   transition: opacity 0.14s ease, transform 0.14s ease;
 }
 .snap-flyout.visible { pointer-events: all; opacity: 1; transform: translateY(0) scale(1); }
-.snap-flyout-lbl { font-size: 11.5px; color: #ccc; margin-bottom: 10px; }
 .snap-grid { display: flex; flex-direction: column; gap: 5px; }
 .snap-row-g { display: flex; gap: 5px; }
 .snap-card {
-  flex: 1; height: 52px;
-  background: #2d2d2d; border-radius: 5px;
-  border: 1.5px solid transparent; cursor: pointer;
-  padding: 5px; display: flex; gap: 3px;
+  flex: 1; height: 52px; background: #2d2d2d; border-radius: 5px;
+  border: 1.5px solid transparent; cursor: pointer; padding: 5px; display: flex; gap: 3px;
   overflow: hidden; transition: border-color 0.08s, background 0.08s;
 }
 .snap-card:hover { border-color: #0078d4; background: #353535; }
@@ -343,10 +192,7 @@ input, textarea { user-select: text; }
 .sp-col { display: flex; flex-direction: column; gap: 3px; flex: 1; }
 
 /* ── Window content ── */
-.wcontent {
-  flex: 1; overflow: hidden; position: relative;
-  border-radius: 0 0 8px 8px;
-}
+.wcontent { flex: 1; overflow: hidden; position: relative; border-radius: 0 0 8px 8px; }
 .wcontent iframe { width: 100%; height: 100%; border: none; display: block; }
 
 /* ── Resize handles ── */
@@ -355,358 +201,379 @@ input, textarea { user-select: text; }
 .rh-s  { bottom:-4px; left:8px;   right:8px;  height:8px;  cursor:s-resize; }
 .rh-w  { left:-4px;   top:8px;    bottom:8px; width:8px;   cursor:w-resize; }
 .rh-e  { right:-4px;  top:8px;    bottom:8px; width:8px;   cursor:e-resize; }
-.rh-nw { top:-4px;    left:-4px;  width:14px; height:14px; cursor:nw-resize; }
-.rh-ne { top:-4px;    right:-4px; width:14px; height:14px; cursor:ne-resize; }
+.rh-nw { top:-4px; left:-4px;   width:14px; height:14px; cursor:nw-resize; }
+.rh-ne { top:-4px; right:-4px;  width:14px; height:14px; cursor:ne-resize; }
 .rh-sw { bottom:-4px; left:-4px;  width:14px; height:14px; cursor:sw-resize; }
 .rh-se { bottom:-4px; right:-4px; width:14px; height:14px; cursor:se-resize; }
 
-/* Blocker over iframes during drag/resize */
 #blocker { display:none; position:fixed; inset:0; z-index:9998; cursor:inherit; }
 body.busy #blocker { display:block; }
 
 /* ── Desktop icon ── */
 .desktop-icon {
-  position: absolute;
-  top: 20px; left: 20px;
+  position: absolute; top: 20px; left: 20px;
   display: flex; flex-direction: column; align-items: center;
-  gap: 4px; padding: 6px; border-radius: 6px;
-  cursor: pointer; width: 72px;
+  gap: 4px; padding: 6px; border-radius: 6px; cursor: pointer; width: 72px;
   transition: background 0.1s;
 }
-.desktop-icon:hover { background: rgba(255,255,255,0.15); }
+.desktop-icon:hover  { background: rgba(255,255,255,0.15); }
 .desktop-icon:active { background: rgba(255,255,255,0.22); }
-.desktop-icon-ico {
-  font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 32px; color: #fff; line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+.di-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 32px; color: #fff; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
+.di-lbl { font-size: 11.5px; color: #fff; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,0.7); line-height: 1.3; }
+
+/* ── Picker app (rendered directly in window, not iframe) ── */
+.papp {
+  width: 100%; height: 100%; background: #f3f3f3;
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 0 0 8px 8px;
 }
-.desktop-icon-label {
-  font-size: 11.5px; color: #fff; text-align: center;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
-  line-height: 1.3; word-break: break-word;
+.papp-body { flex: 1; padding: 22px 26px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+.papp-heading { font-size: 20px; font-weight: 300; color: #1a1a1a; font-family: 'Segoe UI VF', sans-serif; font-weight: 300; }
+.papp-tabs { display: flex; border-bottom: 1px solid #d0d0d0; }
+.papp-tab {
+  padding: 7px 18px; font-size: 13px; color: #555; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.1s, border-color 0.1s;
+}
+.papp-tab:hover { color: #111; }
+.papp-tab.active { color: #0078d4; border-bottom-color: #0078d4; font-weight: 600; }
+.papp-section { display: none; flex-direction: column; gap: 12px; }
+.papp-section.active { display: flex; }
+.papp-lbl { font-size: 12px; color: #666; }
+.papp-filezone {
+  border: 2px dashed #c0c0c0; border-radius: 8px; padding: 26px 16px;
+  text-align: center; cursor: pointer; background: #fff; position: relative;
+  transition: border-color 0.15s, background 0.15s;
+}
+.papp-filezone:hover, .papp-filezone.over { border-color: #0078d4; background: #f0f7ff; }
+.pz-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 28px; color: #0078d4; display: block; margin-bottom: 6px; }
+.pz-txt { font-size: 13px; color: #444; }
+.pz-sub { font-size: 11px; color: #888; margin-top: 3px; }
+.papp-filezone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.papp-sel { display: none; align-items: center; gap: 10px; background: #fff; border: 1px solid #d0d0d0; border-radius: 6px; padding: 9px 12px; }
+.papp-sel.show { display: flex; }
+.psel-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 18px; color: #0078d4; }
+.psel-name { font-size: 13px; color: #111; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.psel-clear { font-size: 11px; color: #888; cursor: pointer; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.psel-clear:hover { background: #eee; color: #c42b1c; }
+.papp-urlinput {
+  border: 1px solid #c0c0c0; border-radius: 6px; padding: 9px 12px;
+  font-size: 13px; color: #111; outline: none; width: 100%;
+  font-family: 'Segoe UI VF', sans-serif; transition: border-color 0.1s;
+}
+.papp-urlinput:focus { border-color: #0078d4; box-shadow: 0 0 0 2px rgba(0,120,212,0.15); }
+.papp-footer {
+  padding: 10px 26px 14px; border-top: 1px solid #ddd;
+  display: flex; justify-content: flex-end; gap: 8px; background: #f3f3f3;
+  border-radius: 0 0 8px 8px;
+}
+.papp-btn {
+  padding: 6px 20px; border-radius: 4px; font-size: 13px;
+  border: 1px solid transparent; cursor: pointer; font-family: 'Segoe UI VF', sans-serif;
+  transition: background 0.1s;
+}
+.papp-btn.cancel { background: #fff; border-color: #c0c0c0; color: #111; }
+.papp-btn.cancel:hover { background: #f0f0f0; }
+.papp-btn.go { background: #0078d4; color: #fff; border-color: #0078d4; }
+.papp-btn.go:hover { background: #106ebe; }
+
+/* Mobile: on small screens make windows full height, taskbar bigger touch targets */
+@media (max-width: 600px) {
+  .tb-app-title { display: none; }
+  .tb-app { min-width: 44px; max-width: 44px; }
+  .tray-date { display: none; }
+  .rh { display: none; } /* no resize handles on mobile */
+}
+
+/* ── Snap Assist overlay ── */
+#snap-assist {
+  display: none;
+  position: fixed; inset: 0; bottom: 48px;
+  z-index: 5000;
+  pointer-events: none;
+}
+#snap-assist.show { display: block; }
+
+.sa-zone {
+  position: absolute;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: all;
+}
+
+.sa-panel {
+  background: rgba(30,30,40,0.82);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  max-width: 420px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+
+.sa-thumb {
+  width: 120px; height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  transition: border-color 0.1s, transform 0.1s;
+  flex-shrink: 0;
+  background: #2a2a3a;
+}
+.sa-thumb:hover { border-color: #0078d4; transform: scale(1.04); }
+
+.sa-thumb-preview {
+  width: 100%; height: calc(100% - 20px);
+  overflow: hidden; position: relative;
+  border-radius: 4px 4px 0 0;
+}
+.sa-thumb-preview iframe {
+  width: 300%; height: 300%;
+  border: none;
+  transform: scale(0.333);
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+/* Fallback color swatch when iframe preview unavailable */
+.sa-thumb-swatch {
+  width: 100%; height: calc(100% - 20px);
+  background: linear-gradient(135deg, #2a3a5c, #1a2a4c);
+  border-radius: 4px 4px 0 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.sa-thumb-swatch span {
+  font-family: 'Segoe Fluent Icons', sans-serif;
+  font-size: 22px; color: rgba(255,255,255,0.4);
+}
+
+.sa-thumb-title {
+  height: 20px; display: flex; align-items: center;
+  padding: 0 5px; background: rgba(0,0,0,0.3);
+  border-radius: 0 0 4px 4px;
+}
+.sa-thumb-title span {
+  font-size: 10px; color: rgba(255,255,255,0.8);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: 'Segoe UI VF', sans-serif;
+}
+
+.sa-dismiss {
+  position: fixed; inset: 0; bottom: 48px;
+  z-index: 4999;
 }
 </style>
 </head>
 <body>
 
 <div id="desktop">
-  <!-- Desktop "Open App" icon -->
-  <div class="desktop-icon" id="desktop-open-btn" title="Open HTML / Website">
-    <span class="desktop-icon-ico">&#xE753;</span>
-    <span class="desktop-icon-label">Open App</span>
+  <div class="desktop-icon" id="desk-open">
+    <span class="di-ico">&#xE753;</span>
+    <span class="di-lbl">Open App</span>
   </div>
 </div>
 
-<!-- Blocker to keep drag/resize smooth over iframes -->
 <div id="blocker"></div>
 
-<!-- Taskbar -->
 <div id="taskbar">
   <div class="tb-left">
-    <!-- Windows logo -->
-    <div class="tb-win-btn" id="tb-win-logo" title="Start">
+    <div class="tb-win-btn" title="Start (disabled)">
       <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L.028 75.48.026 45.7zm4.326-38.931L87.314 0v41.527l-47.318.376zm47.329 39.463l-.044 41.34-47.3-6.573-.066-34.82z" fill="#fff"/>
       </svg>
     </div>
   </div>
-
-  <!-- Open windows list -->
   <div class="tb-center" id="tb-apps">
     <div id="tb-new-btn" title="Open new window">+</div>
   </div>
-
-  <!-- System tray -->
   <div class="tb-right">
-    <div class="tray-icon" id="tray-net" title="Network">
-      <span id="net-icon">&#xE701;</span>
-    </div>
-    <div class="tray-icon" title="Volume">
-      <span>&#xE767;</span>
-    </div>
-    <div class="tray-clock" id="tray-clock">
+    <div class="tray-icon" id="tray-net" title="Network"><span id="net-icon">&#xE701;</span></div>
+    <div class="tray-icon" title="Volume"><span>&#xE767;</span></div>
+    <div class="tray-clock">
       <div class="tray-time" id="clock-time">12:00 PM</div>
       <div class="tray-date" id="clock-date">6/14/2026</div>
     </div>
   </div>
 </div>
 
-
-
 <script>
-// ─────────────────────────────
-// Clock
-// ─────────────────────────────
+// ── Clock ──
 function updateClock() {
   const now = new Date();
   const h = now.getHours(), m = now.getMinutes();
   const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  document.getElementById('clock-time').textContent =
-    h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
-  const d = now;
-  document.getElementById('clock-date').textContent =
-    (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear();
+  document.getElementById('clock-time').textContent = (h%12||12) + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  document.getElementById('clock-date').textContent = (now.getMonth()+1)+'/'+now.getDate()+'/'+now.getFullYear();
 }
-updateClock();
-setInterval(updateClock, 15000);
+updateClock(); setInterval(updateClock, 15000);
 
-// ─────────────────────────────
-// Network detection
-// ─────────────────────────────
-// E701 = WiFi, EB55 = no internet (globe with x), E774 = globe
-// We'll use E701 (wifi) when online, E914 (offline/no signal) when offline
+// ── Network ──
 function updateNet() {
   const icon = document.getElementById('net-icon');
-  const tray = document.getElementById('tray-net');
-  if (navigator.onLine) {
-    icon.textContent = '\uE701'; // WiFi
-    tray.title = 'Connected';
-  } else {
-    icon.textContent = '\uEB55'; // No internet globe
-    tray.title = 'No internet';
-  }
+  icon.textContent = navigator.onLine ? '\uE701' : '\uEB55';
+  document.getElementById('tray-net').title = navigator.onLine ? 'Connected' : 'No internet access';
 }
 updateNet();
-window.addEventListener('online',  updateNet);
+window.addEventListener('online', updateNet);
 window.addEventListener('offline', updateNet);
 
-// ─────────────────────────────
-// Window manager
-// ─────────────────────────────
-let windows = [];
-let nextId  = 1;
-let drag    = null;
-let resize  = null;
-const MIN_W = 320, MIN_H = 200;
+// ── Constants ──
 const TASKBAR_H = 48;
+const MIN_W = 300, MIN_H = 180;
 
-function clampTop(t) { return Math.max(0, Math.min(t, window.innerHeight - TASKBAR_H - 40)); }
+// ── Window manager ──
+let windows = [];
+let nextId = 1;
+let drag = null, resize = null;
+let activePointers = {};
+
+function clampTop(t) { return Math.max(0, Math.min(t, window.innerHeight - TASKBAR_H - 32)); }
 
 function focusWindow(id) {
   windows.forEach(w => {
     w.el.classList.remove('focused');
-    const pill = document.getElementById('tb-pill-' + w.id);
-    if (pill) pill.classList.remove('active');
+    const pill = document.getElementById('tb-pill-'+w.id);
+    if (pill) { pill.classList.remove('active'); if (!w.isMinimized) pill.classList.remove('minimized'); }
   });
-  const win = windows.find(w => w.id === id);
-  if (win) {
-    win.el.classList.add('focused');
-    const pill = document.getElementById('tb-pill-' + id);
-    if (pill) { pill.classList.remove('minimized'); pill.classList.add('active'); }
+  const state = windows.find(w => w.id === id);
+  if (!state) return;
+  state.el.classList.add('focused');
+  const pill = document.getElementById('tb-pill-'+id);
+  if (pill) { pill.classList.remove('minimized'); pill.classList.add('active'); }
+}
+
+// ── applyRect: set final size/pos immediately, animate visually via clip trick ──
+function applyRect(el, l, t, w, h, radius, animate) {
+  if (animate) {
+    // Capture current rendered rect
+    const from = el.getBoundingClientRect();
+    // Apply final values immediately (layout done)
+    el.style.left   = l + 'px'; el.style.top    = t + 'px';
+    el.style.width  = w + 'px'; el.style.height = h + 'px';
+    el.style.borderRadius = radius !== undefined ? radius : '8px';
+    // Now animate from old position using transform
+    const toRect = el.getBoundingClientRect();
+    const dx = from.left - toRect.left;
+    const dy = from.top  - toRect.top;
+    const sx = from.width  / toRect.width;
+    const sy = from.height / toRect.height;
+    // Start at old visual position
+    el.style.transition = 'none';
+    el.style.transform = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+    el.style.transformOrigin = '0 0';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.transition = 'transform 0.18s cubic-bezier(0.2,0,0,1), border-radius 0.18s';
+      el.style.transform = 'none';
+      setTimeout(() => {
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.transformOrigin = '';
+      }, 200);
+    }));
+  } else {
+    el.style.left   = l + 'px'; el.style.top    = t + 'px';
+    el.style.width  = w + 'px'; el.style.height = h + 'px';
+    el.style.borderRadius = radius !== undefined ? radius : '8px';
   }
 }
 
-function createWindow(src, title, isUrl) {
-  const id = nextId++;
-  const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
-  const w = Math.min(1000, vw * 0.88);
-  const h = Math.min(660, vh * 0.9);
-  const l = Math.round((vw - w) / 2) + (windows.length % 5) * 14;
-  const t = Math.round((vh - h) / 2) + (windows.length % 5) * 14;
-
-  const el = document.createElement('div');
-  el.className = 'win11-window focused';
-  el.id = 'win-' + id;
-  el.style.cssText = `left:${l}px;top:${t}px;width:${w}px;height:${h}px;`;
-
-  // Snap layout cards template
-  const snapCardsHTML = `
-    <div class="snap-flyout" id="snap-fly-${id}">
-      <div class="snap-flyout-lbl">Snap layouts</div>
-      <div class="snap-grid">
-        <div class="snap-row-g">
-          <div class="snap-card" data-wid="${id}" data-layout="full"><div class="sp hi" style="flex:1;height:100%;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="left-half"><div class="sp hi" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="right-half"><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:1;height:100%;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="left-2-3"><div class="sp hi" style="flex:2;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
-        </div>
-        <div class="snap-row-g">
-          <div class="snap-card" data-wid="${id}" data-layout="right-2-3"><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:2;height:100%;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="left-third"><div class="sp hi" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="center-third"><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="right-third"><div class="sp" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:1;height:100%;"></div></div>
-        </div>
-        <div class="snap-row-g">
-          <div class="snap-card" data-wid="${id}" data-layout="quad-tl" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp hi" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="quad-tr" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp" style="border-radius:3px;"></div><div class="sp hi" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="quad-bl" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp hi" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div></div>
-          <div class="snap-card" data-wid="${id}" data-layout="quad-br" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp hi" style="border-radius:3px;"></div></div>
-        </div>
-      </div>
-    </div>`;
-
-  el.innerHTML = `
-    <div class="rh rh-n" data-dir="n" data-wid="${id}"></div>
-    <div class="rh rh-s" data-dir="s" data-wid="${id}"></div>
-    <div class="rh rh-w" data-dir="w" data-wid="${id}"></div>
-    <div class="rh rh-e" data-dir="e" data-wid="${id}"></div>
-    <div class="rh rh-nw" data-dir="nw" data-wid="${id}"></div>
-    <div class="rh rh-ne" data-dir="ne" data-wid="${id}"></div>
-    <div class="rh rh-sw" data-dir="sw" data-wid="${id}"></div>
-    <div class="rh rh-se" data-dir="se" data-wid="${id}"></div>
-    <div class="titlebar" data-wid="${id}">
-      <span class="tb-app-ico">&#xE774;</span>
-      <span class="tb-title-text" id="wt-${id}">${title}</span>
-      <div class="wctrl">
-        <button class="wbtn wmin" data-wid="${id}" title="Minimize"><span class="wbtn-ico">&#xE921;</span></button>
-        <button class="wbtn wmax" data-wid="${id}" title="Maximize">${snapCardsHTML}<span class="wbtn-ico" id="wmax-ico-${id}">&#xE922;</span></button>
-        <button class="wbtn wclose" data-wid="${id}" title="Close"><span class="wbtn-ico">&#xE8BB;</span></button>
-      </div>
-    </div>
-    <div class="wcontent">
-      <iframe id="wframe-${id}" ${isUrl ? `src="${src}"` : ''} title="${title}" allowfullscreen></iframe>
-    </div>`;
-
-  document.getElementById('desktop').appendChild(el);
-
-  // If file blob, set iframe src
-  if (!isUrl && src) {
-    document.getElementById('wframe-' + id).src = src;
-  }
-
-  // Try read title from iframe
-  document.getElementById('wframe-' + id).addEventListener('load', () => {
-    try {
-      const t2 = document.getElementById('wframe-' + id).contentDocument?.title;
-      if (t2) {
-        document.getElementById('wt-' + id).textContent = t2;
-        const pill = document.getElementById('tb-pill-' + id);
-        if (pill) pill.querySelector('.tb-app-title').textContent = t2;
-      }
-    } catch(e) {}
-  });
-
-  const state = { id, el, isMaximized: false, preMax: null, isMinimized: false };
-  windows.push(state);
-
-  // Taskbar pill
-  addTaskbarPill(id, title);
-  focusWindow(id);
-
-  // Animate in
-  el.style.opacity = '0';
-  el.style.transform = 'scale(0.96) translateY(8px)';
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    el.style.transition = 'opacity 0.16s, transform 0.16s cubic-bezier(0.2,0,0,1)';
-    el.style.opacity = '1';
-    el.style.transform = 'none';
-    setTimeout(() => { el.style.transition = ''; }, 180);
-  }));
-
-  // Snap flyout hover
-  const snapBtn = el.querySelector('.wmax');
-  const snapFly = document.getElementById('snap-fly-' + id);
-  let flyT = null, flyHT = null;
-  snapBtn.addEventListener('mouseenter', () => {
-    clearTimeout(flyHT);
-    flyT = setTimeout(() => snapFly.classList.add('visible'), 300);
-  });
-  snapBtn.addEventListener('mouseleave', () => {
-    clearTimeout(flyT);
-    flyHT = setTimeout(() => { if (!snapFly.matches(':hover')) snapFly.classList.remove('visible'); }, 120);
-  });
-  snapFly.addEventListener('mouseenter', () => { clearTimeout(flyT); clearTimeout(flyHT); });
-  snapFly.addEventListener('mouseleave', () => { flyHT = setTimeout(() => snapFly.classList.remove('visible'), 80); });
-
-  return state;
+function getRect(el) {
+  return { left: parseFloat(el.style.left), top: parseFloat(el.style.top), width: parseFloat(el.style.width), height: parseFloat(el.style.height) };
 }
 
-function addTaskbarPill(id, title) {
-  const pill = document.createElement('div');
-  pill.className = 'tb-app active';
-  pill.id = 'tb-pill-' + id;
-  pill.title = title;
-  pill.innerHTML = `<span class="tb-app-icon">&#xE774;</span><span class="tb-app-title">${title}</span>`;
-  pill.addEventListener('click', () => {
-    const state = windows.find(w => w.id === id);
-    if (!state) return;
-    if (state.isMinimized) {
-      unminimize(state);
-    } else if (state.el.classList.contains('focused')) {
-      minimize(state);
-    } else {
-      focusWindow(id);
-    }
-  });
-  // Insert before the + button
-  const newBtn = document.getElementById('tb-new-btn');
-  document.getElementById('tb-apps').insertBefore(pill, newBtn);
-}
-
-// ─── Maximize / Restore ───
-function getWinRect(el) {
-  return { left: parseFloat(el.style.left), top: parseFloat(el.style.top),
-           width: parseFloat(el.style.width), height: parseFloat(el.style.height) };
-}
-function applyRect(el, l, t, w, h, r, dur) {
-  if (dur) {
-    el.style.transition = `left ${dur}ms cubic-bezier(0.2,0,0,1),top ${dur}ms cubic-bezier(0.2,0,0,1),width ${dur}ms cubic-bezier(0.2,0,0,1),height ${dur}ms cubic-bezier(0.2,0,0,1),border-radius ${dur}ms`;
-    setTimeout(() => el.style.transition = '', dur + 20);
-  }
-  el.style.left = l+'px'; el.style.top = t+'px';
-  el.style.width = w+'px'; el.style.height = h+'px';
-  el.style.borderRadius = r !== undefined ? r : '8px';
-}
-
+// ── Maximize / Restore ──
 function maximize(state) {
-  state.preMax = getWinRect(state.el);
-  applyRect(state.el, 0, 0, window.innerWidth, window.innerHeight - TASKBAR_H, '0px', 160);
-  document.getElementById('wmax-ico-' + state.id).textContent = '\uE923';
+  state.preMax = getRect(state.el);
+  applyRect(state.el, 0, 0, window.innerWidth, window.innerHeight - TASKBAR_H, '0px', true);
+  document.getElementById('wmax-ico-'+state.id).textContent = '\uE923';
   state.isMaximized = true;
+  state.el.classList.add('maximized');
 }
 function restoreMax(state) {
-  const r = state.preMax || { left:(window.innerWidth-1000)/2, top:(window.innerHeight-TASKBAR_H-660)/2, width:1000, height:660 };
-  applyRect(state.el, r.left, r.top, r.width, r.height, '8px', 160);
-  document.getElementById('wmax-ico-' + state.id).textContent = '\uE922';
+  const r = state.preMax || { left:(window.innerWidth-900)/2, top:(window.innerHeight-TASKBAR_H-600)/2, width:900, height:600 };
+  applyRect(state.el, r.left, r.top, r.width, r.height, '8px', true);
+  document.getElementById('wmax-ico-'+state.id).textContent = '\uE922';
   state.isMaximized = false;
+  state.el.classList.remove('maximized');
 }
 function toggleMax(state) { if (state.isMaximized) restoreMax(state); else maximize(state); }
 
 // Snap layouts
 const SNAP_FNS = {
-  'full':         () => [0, 0, window.innerWidth, window.innerHeight - TASKBAR_H, '0px'],
-  'left-half':    () => [0, 0, window.innerWidth/2, window.innerHeight - TASKBAR_H, '8px'],
-  'right-half':   () => [window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight - TASKBAR_H, '8px'],
-  'left-2-3':     () => [0, 0, window.innerWidth*(2/3), window.innerHeight - TASKBAR_H, '8px'],
-  'right-2-3':    () => [window.innerWidth/3, 0, window.innerWidth*(2/3), window.innerHeight - TASKBAR_H, '8px'],
-  'left-third':   () => [0, 0, window.innerWidth/3, window.innerHeight - TASKBAR_H, '8px'],
-  'center-third': () => [window.innerWidth/3, 0, window.innerWidth/3, window.innerHeight - TASKBAR_H, '8px'],
-  'right-third':  () => [window.innerWidth*(2/3), 0, window.innerWidth/3, window.innerHeight - TASKBAR_H, '8px'],
-  'quad-tl':      () => [0, 0, window.innerWidth/2, (window.innerHeight - TASKBAR_H)/2, '8px'],
-  'quad-tr':      () => [window.innerWidth/2, 0, window.innerWidth/2, (window.innerHeight - TASKBAR_H)/2, '8px'],
+  'full':         () => [0, 0, window.innerWidth, window.innerHeight-TASKBAR_H, '0px'],
+  'left-half':    () => [0, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
+  'right-half':   () => [window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
+  'left-2-3':     () => [0, 0, window.innerWidth*(2/3), window.innerHeight-TASKBAR_H, '8px'],
+  'right-2-3':    () => [window.innerWidth/3, 0, window.innerWidth*(2/3), window.innerHeight-TASKBAR_H, '8px'],
+  'left-third':   () => [0, 0, window.innerWidth/3, window.innerHeight-TASKBAR_H, '8px'],
+  'center-third': () => [window.innerWidth/3, 0, window.innerWidth/3, window.innerHeight-TASKBAR_H, '8px'],
+  'right-third':  () => [window.innerWidth*(2/3), 0, window.innerWidth/3, window.innerHeight-TASKBAR_H, '8px'],
+  'quad-tl':      () => [0, 0, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
+  'quad-tr':      () => [window.innerWidth/2, 0, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
   'quad-bl':      () => [0, (window.innerHeight-TASKBAR_H)/2, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
   'quad-br':      () => [window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
 };
 
-// ─── Minimize ───
+// ── Minimize: animate toward taskbar pill ──
+function getPillCenter(id) {
+  const pill = document.getElementById('tb-pill-'+id);
+  if (!pill) return { x: window.innerWidth/2, y: window.innerHeight - TASKBAR_H/2 };
+  const r = pill.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
+}
+
 function minimize(state) {
   state.isMinimized = true;
-  const pill = document.getElementById('tb-pill-' + state.id);
+  const pill = document.getElementById('tb-pill-'+state.id);
   if (pill) { pill.classList.remove('active'); pill.classList.add('minimized'); }
-  state.el.style.transition = 'opacity 0.18s, transform 0.18s cubic-bezier(0.4,0,0.2,1)';
+
+  const target = getPillCenter(state.id);
+  const winRect = state.el.getBoundingClientRect();
+  const winCX = winRect.left + winRect.width/2;
+  const winCY = winRect.top  + winRect.height/2;
+  const dx = target.x - winCX;
+  const dy = target.y - winCY;
+
+  state.el.style.transition = 'transform 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.22s';
+  state.el.style.transformOrigin = 'center center';
+  state.el.style.transform = `translate(${dx}px,${dy}px) scale(0.12)`;
   state.el.style.opacity = '0';
-  state.el.style.transform = 'translateY(30px) scaleY(0.7) scaleX(0.85)';
-  state.el.style.transformOrigin = 'bottom center';
+
   setTimeout(() => {
     state.el.classList.add('hidden');
     state.el.style.transition = '';
-    state.el.style.transform = '';
-  }, 200);
+    state.el.style.transform  = '';
+    state.el.style.opacity    = '';
+  }, 230);
 }
 
 function unminimize(state) {
   state.isMinimized = false;
+  const target = getPillCenter(state.id);
+  const winRect = state.el.getBoundingClientRect();
+  const winCX = (parseFloat(state.el.style.left)||0) + (parseFloat(state.el.style.width)||900)/2;
+  const winCY = (parseFloat(state.el.style.top)||0)  + (parseFloat(state.el.style.height)||600)/2;
+  const dx = target.x - winCX;
+  const dy = target.y - winCY;
+
   state.el.classList.remove('hidden');
+  state.el.style.transition = 'none';
+  state.el.style.transformOrigin = 'center center';
+  state.el.style.transform = `translate(${dx}px,${dy}px) scale(0.12)`;
   state.el.style.opacity = '0';
-  state.el.style.transform = 'translateY(30px) scaleY(0.7) scaleX(0.85)';
-  state.el.style.transformOrigin = 'bottom center';
-  state.el.style.transition = '';
+
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    state.el.style.transition = 'opacity 0.18s, transform 0.18s cubic-bezier(0.2,0,0,1)';
-    state.el.style.opacity = '1';
+    state.el.style.transition = 'transform 0.22s cubic-bezier(0.2,0,0,1), opacity 0.22s';
     state.el.style.transform = 'none';
-    setTimeout(() => { state.el.style.transition = ''; state.el.style.transform = ''; }, 200);
+    state.el.style.opacity = '1';
+    setTimeout(() => {
+      state.el.style.transition = '';
+      state.el.style.transform  = '';
+      state.el.style.opacity    = '';
+      state.el.style.transformOrigin = '';
+    }, 230);
   }));
   focusWindow(state.id);
 }
@@ -720,175 +587,171 @@ function closeWindow(id) {
   state.el.style.transform = 'scale(0.97)';
   setTimeout(() => {
     state.el.remove();
-    const pill = document.getElementById('tb-pill-' + id);
-    if (pill) pill.remove();
+    document.getElementById('tb-pill-'+id)?.remove();
   }, 115);
   windows.splice(idx, 1);
-  // Focus next window
   if (windows.length > 0) focusWindow(windows[windows.length-1].id);
 }
 
-// ─────────────────────────────
-// Event delegation on desktop
-// ─────────────────────────────
-document.addEventListener('mousedown', (e) => {
-  // Focus clicked window
-  const winEl = e.target.closest('.win11-window');
-  if (winEl) {
-    const id = parseInt(winEl.id.replace('win-',''));
-    if (!e.target.closest('.wbtn') && !e.target.closest('.snap-flyout') && !e.target.closest('.rh')) {
-      focusWindow(id);
-    }
-  }
+function addTaskbarPill(id, title) {
+  const pill = document.createElement('div');
+  pill.className = 'tb-app active';
+  pill.id = 'tb-pill-'+id;
+  pill.title = title;
+  pill.innerHTML = `<span class="tb-app-icon">&#xE774;</span><span class="tb-app-title">${title}</span>`;
+  pill.addEventListener('click', () => {
+    const state = windows.find(w => w.id === id);
+    if (!state) return;
+    if (state.isMinimized) unminimize(state);
+    else if (state.el.classList.contains('focused')) minimize(state);
+    else focusWindow(id);
+  });
+  document.getElementById('tb-apps').insertBefore(pill, document.getElementById('tb-new-btn'));
+}
 
-  // Titlebar drag
-  if (e.target.closest('.titlebar') && !e.target.closest('.wctrl') && e.button === 0) {
-    const tb = e.target.closest('.titlebar');
-    const wid = parseInt(tb.dataset.wid);
-    const state = windows.find(w => w.id === wid);
-    if (state && !state.isMaximized) {
-      const r = state.el.getBoundingClientRect();
-      drag = { state, ox: e.clientX - r.left, oy: e.clientY - r.top };
-      document.body.classList.add('busy');
-      e.preventDefault();
-    }
-  }
+// ── Snap flyout wiring ──
+function wireSnapFlyout(id, snapBtn) {
+  const snapFly = document.getElementById('snap-fly-'+id);
+  if (!snapFly || snapFly.children.length === 0) return;
+  let flyT = null, flyHT = null;
+  const show = () => { clearTimeout(flyHT); clearTimeout(flyT); flyT = setTimeout(() => snapFly.classList.add('visible'), 1000); };
+  const hide = () => { clearTimeout(flyT); flyHT = setTimeout(() => { if (!snapFly.matches(':hover')) snapFly.classList.remove('visible'); }, 120); };
+  snapBtn.addEventListener('mouseenter', show);
+  snapBtn.addEventListener('mouseleave', hide);
+  snapFly.addEventListener('mouseenter', () => { clearTimeout(flyT); clearTimeout(flyHT); });
+  snapFly.addEventListener('mouseleave', hide);
+}
 
-  // Resize handles
-  if (e.target.classList.contains('rh') && e.button === 0) {
-    const wid = parseInt(e.target.dataset.wid);
-    const state = windows.find(w => w.id === wid);
-    if (state && !state.isMaximized) {
-      const r = state.el.getBoundingClientRect();
-      resize = { state, dir: e.target.dataset.dir, sx: e.clientX, sy: e.clientY, sl: r.left, st: r.top, sw: r.width, sh: r.height };
-      document.body.classList.add('busy');
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }
-});
+// ── Build snap flyout HTML ──
+function snapFlyoutHTML(id) {
+  return `<div class="snap-flyout" id="snap-fly-${id}">
+    <div class="snap-grid">
+      <div class="snap-row-g">
+        <div class="snap-card" data-wid="${id}" data-layout="full"><div class="sp hi" style="flex:1;height:100%;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="left-half"><div class="sp hi" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="right-half"><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:1;height:100%;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="left-2-3"><div class="sp hi" style="flex:2;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
+      </div>
+      <div class="snap-row-g">
+        <div class="snap-card" data-wid="${id}" data-layout="right-2-3"><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:2;height:100%;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="left-third"><div class="sp hi" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="center-third"><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="right-third"><div class="sp" style="flex:1;height:100%;"></div><div class="sp" style="flex:1;height:100%;"></div><div class="sp hi" style="flex:1;height:100%;"></div></div>
+      </div>
+      <div class="snap-row-g">
+        <div class="snap-card" data-wid="${id}" data-layout="quad-tl" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp hi" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="quad-tr" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp" style="border-radius:3px;"></div><div class="sp hi" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="quad-bl" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp hi" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div></div>
+        <div class="snap-card" data-wid="${id}" data-layout="quad-br" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:5px;"><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp" style="border-radius:3px;"></div><div class="sp hi" style="border-radius:3px;"></div></div>
+      </div>
+    </div>
+  </div>`;
+}
 
-document.addEventListener('click', (e) => {
-  // Titlebar double-click
-  if (e.detail === 2 && e.target.closest('.titlebar') && !e.target.closest('.wctrl')) {
-    const wid = parseInt(e.target.closest('.titlebar').dataset.wid);
-    const state = windows.find(w => w.id === wid);
-    if (state) toggleMax(state);
-  }
+// ── Create a generic window with iframe ──
+function createWindow(src, title, isUrl) {
+  const id = nextId++;
+  const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
+  const isMobile = vw < 600;
+  const W = isMobile ? vw : Math.min(1000, vw * 0.88);
+  const H = isMobile ? vh : Math.min(660, vh * 0.9);
+  const l = isMobile ? 0 : Math.round((vw - W)/2) + (windows.length%5)*14;
+  const t = isMobile ? 0 : Math.round((vh - H)/2) + (windows.length%5)*14;
 
-  // Maximize button
-  if (e.target.closest('.wmax') && !e.target.closest('.snap-flyout')) {
-    const wid = parseInt(e.target.closest('.wmax').dataset.wid);
-    const state = windows.find(w => w.id === wid);
-    if (state) toggleMax(state);
-    e.stopPropagation();
-  }
+  const el = document.createElement('div');
+  el.className = 'win11-window focused';
+  el.id = 'win-'+id;
+  el.style.cssText = `left:${l}px;top:${t}px;width:${W}px;height:${H}px;`;
+  if (isMobile) { el.style.borderRadius = '0'; el.classList.add('maximized'); }
 
-  // Minimize button
-  if (e.target.closest('.wmin')) {
-    const wid = parseInt(e.target.closest('.wmin').dataset.wid);
-    const state = windows.find(w => w.id === wid);
-    if (state) minimize(state);
-    e.stopPropagation();
-  }
+  el.innerHTML = `
+    <div class="rh rh-n" data-dir="n" data-wid="${id}"></div><div class="rh rh-s" data-dir="s" data-wid="${id}"></div>
+    <div class="rh rh-w" data-dir="w" data-wid="${id}"></div><div class="rh rh-e" data-dir="e" data-wid="${id}"></div>
+    <div class="rh rh-nw" data-dir="nw" data-wid="${id}"></div><div class="rh rh-ne" data-dir="ne" data-wid="${id}"></div>
+    <div class="rh rh-sw" data-dir="sw" data-wid="${id}"></div><div class="rh rh-se" data-dir="se" data-wid="${id}"></div>
+    <div class="titlebar" data-wid="${id}">
+      <span class="tb-app-ico">&#xE774;</span>
+      <span class="tb-title-text" id="wt-${id}">${title}</span>
+      <div class="wctrl">
+        <button class="wbtn wmin" data-wid="${id}" title="Minimize"><span class="wbtn-ico">&#xE921;</span></button>
+        <button class="wbtn wmax" data-wid="${id}" title="Maximize">${snapFlyoutHTML(id)}<span class="wbtn-ico" id="wmax-ico-${id}">${isMobile ? '\uE923' : '\uE922'}</span></button>
+        <button class="wbtn wclose" data-wid="${id}" title="Close"><span class="wbtn-ico">&#xE8BB;</span></button>
+      </div>
+    </div>
+    <div class="wcontent"><iframe id="wframe-${id}" src="${src}" title="${title}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe></div>`;
 
-  // Close button
-  if (e.target.closest('.wclose')) {
-    const wid = parseInt(e.target.closest('.wclose').dataset.wid);
-    closeWindow(wid);
-    e.stopPropagation();
-  }
+  document.getElementById('desktop').appendChild(el);
 
-  // Snap card
-  if (e.target.closest('.snap-card')) {
-    const card = e.target.closest('.snap-card');
-    const wid = parseInt(card.dataset.wid);
-    const state = windows.find(w => w.id === wid);
-    if (state) {
-      const fn = SNAP_FNS[card.dataset.layout];
-      if (fn) {
-        state.preMax = getWinRect(state.el);
-        const [l,t,w,h,r] = fn();
-        applyRect(state.el, l, t, w, h, r, 160);
-        state.isMaximized = (card.dataset.layout === 'full');
-        document.getElementById('wmax-ico-' + wid).textContent = state.isMaximized ? '\uE923' : '\uE922';
-        document.getElementById('snap-fly-' + wid).classList.remove('visible');
+  const state = { id, el, isMaximized: isMobile, preMax: null, isMinimized: false };
+  if (isMobile) state.preMax = { left:0, top:0, width:vw, height:vh };
+  windows.push(state);
+
+  // Try read iframe title
+  document.getElementById('wframe-'+id).addEventListener('load', () => {
+    try {
+      const t2 = document.getElementById('wframe-'+id).contentDocument?.title;
+      if (t2) {
+        document.getElementById('wt-'+id).textContent = t2;
+        const pill = document.getElementById('tb-pill-'+id);
+        if (pill) pill.querySelector('.tb-app-title').textContent = t2;
       }
-    }
-    e.stopPropagation();
-  }
-});
+    } catch(e) {}
+  });
 
-document.addEventListener('mousemove', (e) => {
-  if (drag) {
-    const { state, ox, oy } = drag;
-    state.el.style.left = (e.clientX - ox) + 'px';
-    state.el.style.top  = clampTop(e.clientY - oy) + 'px';
-  }
-  if (resize) {
-    const { state, dir, sx, sy, sl, st, sw, sh } = resize;
-    const dx = e.clientX - sx, dy = e.clientY - sy;
-    let l = sl, t = st, w = sw, h = sh;
-    if (dir.includes('e')) w = Math.max(MIN_W, sw + dx);
-    if (dir.includes('s')) h = Math.max(MIN_H, sh + dy);
-    if (dir.includes('w')) { const nw = Math.max(MIN_W, sw - dx); l = sl + sw - nw; w = nw; }
-    if (dir.includes('n')) { const nh = Math.max(MIN_H, sh - dy); t = clampTop(st + sh - nh); h = nh; }
-    state.el.style.left = l+'px'; state.el.style.top = t+'px';
-    state.el.style.width = w+'px'; state.el.style.height = h+'px';
-  }
-});
+  addTaskbarPill(id, title);
+  focusWindow(id);
+  wireSnapFlyout(id, el.querySelector('.wmax'));
 
-document.addEventListener('mouseup', () => {
-  drag = resize = null;
-  document.body.classList.remove('busy');
-});
+  // Animate in
+  el.style.opacity = '0'; el.style.transform = 'scale(0.96) translateY(6px)';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.style.transition = 'opacity 0.15s, transform 0.15s cubic-bezier(0.2,0,0,1)';
+    el.style.opacity = '1'; el.style.transform = 'none';
+    setTimeout(() => { el.style.transition = ''; }, 170);
+  }));
 
-// ─────────────────────────────
-// Picker window app
-// ─────────────────────────────
-let pickerWinState = null;
+  return state;
+}
+
+// ── Picker window ──
+let pickerState = null;
 
 function openPickerWindow() {
-  // If already open, just focus it
-  if (pickerWinState && windows.find(w => w.id === pickerWinState.id)) {
-    if (pickerWinState.isMinimized) unminimize(pickerWinState);
-    else focusWindow(pickerWinState.id);
+  if (pickerState && windows.find(w => w.id === pickerState.id)) {
+    if (pickerState.isMinimized) unminimize(pickerState);
+    else focusWindow(pickerState.id);
     return;
   }
 
   const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
-  const W = 480, H = 360;
-  const l = Math.round((vw - W) / 2);
-  const t = Math.round((vh - H) / 2);
-
+  const isMobile = vw < 600;
+  const W = isMobile ? vw : 460;
+  const H = isMobile ? vh : 370;
+  const l = isMobile ? 0 : Math.round((vw - W)/2);
+  const t = isMobile ? 0 : Math.round((vh - H)/2);
   const id = nextId++;
+
   const el = document.createElement('div');
   el.className = 'win11-window focused';
-  el.id = 'win-' + id;
+  el.id = 'win-'+id;
   el.style.cssText = `left:${l}px;top:${t}px;width:${W}px;height:${H}px;`;
+  if (isMobile) { el.style.borderRadius = '0'; el.classList.add('maximized'); }
 
   el.innerHTML = `
-    <div class="rh rh-n" data-dir="n" data-wid="${id}"></div>
-    <div class="rh rh-s" data-dir="s" data-wid="${id}"></div>
-    <div class="rh rh-w" data-dir="w" data-wid="${id}"></div>
-    <div class="rh rh-e" data-dir="e" data-wid="${id}"></div>
-    <div class="rh rh-nw" data-dir="nw" data-wid="${id}"></div>
-    <div class="rh rh-ne" data-dir="ne" data-wid="${id}"></div>
-    <div class="rh rh-sw" data-dir="sw" data-wid="${id}"></div>
-    <div class="rh rh-se" data-dir="se" data-wid="${id}"></div>
+    <div class="rh rh-n" data-dir="n" data-wid="${id}"></div><div class="rh rh-s" data-dir="s" data-wid="${id}"></div>
+    <div class="rh rh-w" data-dir="w" data-wid="${id}"></div><div class="rh rh-e" data-dir="e" data-wid="${id}"></div>
+    <div class="rh rh-nw" data-dir="nw" data-wid="${id}"></div><div class="rh rh-ne" data-dir="ne" data-wid="${id}"></div>
+    <div class="rh rh-sw" data-dir="sw" data-wid="${id}"></div><div class="rh rh-se" data-dir="se" data-wid="${id}"></div>
     <div class="titlebar" data-wid="${id}">
       <span class="tb-app-ico">&#xED25;</span>
-      <span class="tb-title-text">Open — Choose a file or URL</span>
+      <span class="tb-title-text">Open — Choose file or URL</span>
       <div class="wctrl">
         <button class="wbtn wmin" data-wid="${id}" title="Minimize"><span class="wbtn-ico">&#xE921;</span></button>
-        <button class="wbtn wmax" data-wid="${id}" title="Maximize">
-          <div class="snap-flyout" id="snap-fly-${id}" style="display:none;"></div>
-          <span class="wbtn-ico" id="wmax-ico-${id}">&#xE922;</span>
-        </button>
+        <button class="wbtn wmax" data-wid="${id}" title="Maximize"><span class="wbtn-ico" id="wmax-ico-${id}">${isMobile?'\uE923':'\uE922'}</span></button>
         <button class="wbtn wclose" data-wid="${id}" title="Close"><span class="wbtn-ico">&#xE8BB;</span></button>
       </div>
     </div>
-    <div class="wcontent" id="picker-wcontent-${id}" style="background:#f3f3f3; border-radius:0 0 8px 8px;">
+    <div class="wcontent" style="overflow:hidden;">
       <div class="papp">
         <div class="papp-body">
           <div class="papp-heading">Open</div>
@@ -896,159 +759,391 @@ function openPickerWindow() {
             <div class="papp-tab active" data-ptab="file" data-pid="${id}">HTML File</div>
             <div class="papp-tab" data-ptab="url" data-pid="${id}">Website URL</div>
           </div>
-
           <div class="papp-section active" id="psec-file-${id}">
             <div class="papp-filezone" id="pzone-${id}">
-              <span class="papp-filezone-ico">&#xED25;</span>
-              <div class="papp-filezone-text">Click to browse or drag &amp; drop</div>
-              <div class="papp-filezone-sub">.html, .htm files</div>
+              <span class="pz-ico">&#xED25;</span>
+              <div class="pz-txt">Click to browse or drag &amp; drop</div>
+              <div class="pz-sub">.html and .htm files</div>
               <input type="file" id="pfile-${id}" accept=".html,.htm">
             </div>
-            <div class="papp-selected" id="psel-${id}">
-              <span class="papp-selected-ico">&#xED25;</span>
-              <span class="papp-selected-name" id="psel-name-${id}"></span>
-              <span class="papp-selected-clear" data-pid="${id}">✕ Clear</span>
+            <div class="papp-sel" id="psel-${id}">
+              <span class="psel-ico">&#xED25;</span>
+              <span class="psel-name" id="psel-name-${id}"></span>
+              <span class="psel-clear" data-pclear="${id}">✕</span>
             </div>
           </div>
-
           <div class="papp-section" id="psec-url-${id}">
-            <div class="papp-label">Enter any website URL</div>
-            <input class="papp-urlinput" id="purl-${id}" type="text" placeholder="https://example.com" spellcheck="false">
+            <div class="papp-lbl">Enter any website URL</div>
+            <input class="papp-urlinput" id="purl-${id}" type="text" placeholder="https://example.com" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
         </div>
-
         <div class="papp-footer">
-          <button class="papp-btn cancel" data-paction="cancel" data-pid="${id}">Cancel</button>
-          <button class="papp-btn open" data-paction="open" data-pid="${id}">Open</button>
+          <button class="papp-btn cancel" data-pcancel="${id}">Cancel</button>
+          <button class="papp-btn go" data-popen="${id}">Open</button>
         </div>
       </div>
     </div>`;
 
   document.getElementById('desktop').appendChild(el);
 
-  const state = { id, el, isMaximized: false, preMax: null, isMinimized: false };
+  const state = { id, el, isMaximized: isMobile, preMax: null, isMinimized: false };
+  if (isMobile) state.preMax = { left:0, top:0, width:vw, height:vh };
   windows.push(state);
-  pickerWinState = state;
+  pickerState = state;
 
   addTaskbarPill(id, 'Open');
   focusWindow(id);
 
   // Animate in
-  el.style.opacity = '0';
-  el.style.transform = 'scale(0.96) translateY(8px)';
+  el.style.opacity = '0'; el.style.transform = 'scale(0.96) translateY(6px)';
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    el.style.transition = 'opacity 0.16s, transform 0.16s cubic-bezier(0.2,0,0,1)';
+    el.style.transition = 'opacity 0.15s, transform 0.15s cubic-bezier(0.2,0,0,1)';
     el.style.opacity = '1'; el.style.transform = 'none';
-    setTimeout(() => { el.style.transition = ''; }, 180);
+    setTimeout(() => { el.style.transition = ''; }, 170);
   }));
 
-  // Wire up file input
-  const fileInput = document.getElementById('pfile-' + id);
-  const zone      = document.getElementById('pzone-' + id);
-  const selBox    = document.getElementById('psel-' + id);
-  const selName   = document.getElementById('psel-name-' + id);
-
+  // File input
+  const fileInput = document.getElementById('pfile-'+id);
+  const zone      = document.getElementById('pzone-'+id);
   fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) {
-      selName.textContent = fileInput.files[0].name;
-      selBox.classList.add('show');
-      zone.style.display = 'none';
-    }
+    const f = fileInput.files[0];
+    if (!f) return;
+    zone._file = f;
+    document.getElementById('psel-name-'+id).textContent = f.name;
+    document.getElementById('psel-'+id).classList.add('show');
+    zone.style.display = 'none';
   });
-
-  // Drag over zone
-  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-  zone.addEventListener('drop', (e) => {
-    e.preventDefault(); zone.classList.remove('dragover');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('over');
     const f = e.dataTransfer.files[0];
-    if (f && (f.name.endsWith('.html') || f.name.endsWith('.htm'))) {
-      // Manually assign to input via DataTransfer trick isn't possible; store ref
-      zone._droppedFile = f;
-      selName.textContent = f.name;
-      selBox.classList.add('show');
+    if (f && /\.html?$/i.test(f.name)) {
+      zone._file = f;
+      document.getElementById('psel-name-'+id).textContent = f.name;
+      document.getElementById('psel-'+id).classList.add('show');
       zone.style.display = 'none';
     }
   });
 }
 
-// Picker tab switching (delegated)
-document.addEventListener('click', (e) => {
-  // Picker tab
-  if (e.target.dataset.ptab) {
-    const pid = e.target.dataset.pid;
-    const tab = e.target.dataset.ptab;
-    el.querySelectorAll && void 0; // unused
+function pickerDoOpen(pid) {
+  const activeTabEl = document.querySelector(`.papp-tab.active[data-pid="${pid}"]`);
+  const tab = activeTabEl ? activeTabEl.dataset.ptab : 'file';
+  if (tab === 'file') {
+    const zone = document.getElementById('pzone-'+pid);
+    const fileEl = document.getElementById('pfile-'+pid);
+    const file = zone?._file || fileEl?.files[0];
+    if (!file) { fileEl?.click(); return; }
+    const src = URL.createObjectURL(file);
+    closeWindow(pid);
+    pickerState = null;
+    createWindow(src, file.name, true);
+  } else {
+    let url = (document.getElementById('purl-'+pid)?.value || '').trim();
+    if (!url) { document.getElementById('purl-'+pid)?.focus(); return; }
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    closeWindow(pid);
+    pickerState = null;
+    createWindow(url, url.replace(/^https?:\/\//,'').split('/')[0], true);
+  }
+}
+
+// ── Event delegation ──
+document.addEventListener('click', e => {
+  // Picker tab switch
+  const ptab = e.target.closest('[data-ptab]');
+  if (ptab && !e.target.closest('.snap-flyout')) {
+    const pid = ptab.dataset.pid;
+    const tab = ptab.dataset.ptab;
     document.querySelectorAll(`[data-ptab][data-pid="${pid}"]`).forEach(t => t.classList.remove('active'));
-    document.querySelectorAll(`.papp-section[id^="psec-"][id$="-${pid}"]`).forEach(s => s.classList.remove('active'));
-    e.target.classList.add('active');
-    document.getElementById(`psec-${tab}-${pid}`).classList.add('active');
-    e.stopPropagation();
+    document.querySelectorAll(`#psec-file-${pid}, #psec-url-${pid}`).forEach(s => s.classList.remove('active'));
+    ptab.classList.add('active');
+    document.getElementById(`psec-${tab}-${pid}`)?.classList.add('active');
+    return;
   }
 
-  // Clear file
-  if (e.target.dataset.pid && e.target.classList.contains('papp-selected-clear')) {
-    const pid = e.target.dataset.pid;
-    const zone = document.getElementById('pzone-' + pid);
-    zone._droppedFile = null;
-    document.getElementById('pfile-' + pid).value = '';
-    document.getElementById('psel-' + pid).classList.remove('show');
-    zone.style.display = '';
-    e.stopPropagation();
+  // Picker clear file
+  const pclear = e.target.closest('[data-pclear]');
+  if (pclear) {
+    const pid = pclear.dataset.pclear;
+    const zone = document.getElementById('pzone-'+pid);
+    if (zone) { zone._file = null; zone.style.display = ''; }
+    document.getElementById('pfile-'+pid).value = '';
+    document.getElementById('psel-'+pid).classList.remove('show');
+    return;
   }
 
-  // Cancel / Open buttons
-  if (e.target.dataset.paction) {
-    const pid = parseInt(e.target.dataset.pid);
-    const action = e.target.dataset.paction;
+  // Picker cancel
+  const pcancel = e.target.closest('[data-pcancel]');
+  if (pcancel) {
+    closeWindow(parseInt(pcancel.dataset.pcancel));
+    pickerState = null;
+    return;
+  }
 
-    if (action === 'cancel') {
-      closeWindow(pid);
-      pickerWinState = null;
-      e.stopPropagation();
-      return;
+  // Picker open
+  const popen = e.target.closest('[data-popen]');
+  if (popen) { pickerDoOpen(parseInt(popen.dataset.popen)); return; }
+
+  // Titlebar dbl-click
+  if (e.detail === 2) {
+    const tb = e.target.closest('.titlebar');
+    if (tb && !e.target.closest('.wctrl')) {
+      const state = windows.find(w => w.id === parseInt(tb.dataset.wid));
+      if (state) toggleMax(state);
     }
+  }
 
-    if (action === 'open') {
-      // Determine active tab
-      const activeTabEl = document.querySelector(`[data-ptab].active[data-pid="${pid}"]`);
-      const tab = activeTabEl ? activeTabEl.dataset.ptab : 'file';
+  // Maximize
+  const wmaxBtn = e.target.closest('.wmax');
+  if (wmaxBtn && !e.target.closest('.snap-flyout') && !e.target.closest('.snap-card')) {
+    const state = windows.find(w => w.id === parseInt(wmaxBtn.dataset.wid));
+    if (state) toggleMax(state);
+  }
 
-      if (tab === 'file') {
-        const zone = document.getElementById('pzone-' + pid);
-        const fileEl = document.getElementById('pfile-' + pid);
-        const file = zone._droppedFile || fileEl.files[0];
-        if (!file) { fileEl.click(); return; }
-        const src = URL.createObjectURL(file);
-        closeWindow(pid);
-        pickerWinState = null;
-        createWindow(src, file.name, true);
-      } else {
-        let url = document.getElementById('purl-' + pid).value.trim();
-        if (!url) { document.getElementById('purl-' + pid).focus(); return; }
-        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-        closeWindow(pid);
-        pickerWinState = null;
-        createWindow(url, url.replace(/^https?:\/\//,'').split('/')[0], true);
+  // Minimize
+  const wminBtn = e.target.closest('.wmin');
+  if (wminBtn) { const state = windows.find(w => w.id === parseInt(wminBtn.dataset.wid)); if (state) minimize(state); }
+
+  // Close
+  const wcloseBtn = e.target.closest('.wclose');
+  if (wcloseBtn) { closeWindow(parseInt(wcloseBtn.dataset.wid)); }
+
+  // Snap card
+  const scard = e.target.closest('.snap-card');
+  if (scard) {
+    const wid = parseInt(scard.dataset.wid);
+    const state = windows.find(w => w.id === wid);
+    if (state) {
+      const fn = SNAP_FNS[scard.dataset.layout];
+      if (fn) {
+        state.preMax = getRect(state.el);
+        const [l,t,w,h,r] = fn();
+        applyRect(state.el, l, t, w, h, r, true);
+        const isFull = scard.dataset.layout === 'full';
+        state.isMaximized = isFull;
+        if (isFull) state.el.classList.add('maximized'); else state.el.classList.remove('maximized');
+        document.getElementById('wmax-ico-'+wid).textContent = isFull ? '\uE923' : '\uE922';
+        document.getElementById('snap-fly-'+wid)?.classList.remove('visible');
+        if (!isFull) showSnapAssist(state, scard.dataset.layout);
       }
-      e.stopPropagation();
     }
   }
-});
+}, true); // use capture so ptab fires before stopPropagation
 
 // Enter key in URL input
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.classList.contains('papp-urlinput')) {
     const pid = e.target.id.replace('purl-','');
-    document.querySelector(`[data-paction="open"][data-pid="${pid}"]`)?.click();
+    pickerDoOpen(parseInt(pid));
   }
 });
 
-// ─────────────────────────────
-// Open buttons
-// ─────────────────────────────
+// ── Pointer events for drag + resize (mouse & touch) ──
+function getPointerPos(e) {
+  if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+function onPointerDown(e) {
+  const pos = getPointerPos(e);
+
+  // Focus clicked window
+  const winEl = e.target.closest('.win11-window');
+  if (winEl) {
+    const id = parseInt(winEl.id.replace('win-',''));
+    if (!e.target.closest('.wbtn') && !e.target.closest('.snap-flyout') && !e.target.closest('.rh')) focusWindow(id);
+  }
+
+  // Titlebar drag
+  const tb = e.target.closest('.titlebar');
+  if (tb && !e.target.closest('.wctrl') && (e.button === 0 || e.touches)) {
+    const wid = parseInt(tb.dataset.wid);
+    const state = windows.find(w => w.id === wid);
+    if (state && !state.isMaximized) {
+      const r = state.el.getBoundingClientRect();
+      drag = { state, ox: pos.x - r.left, oy: pos.y - r.top };
+      document.body.classList.add('busy');
+      if (!e.touches) e.preventDefault();
+    }
+    return;
+  }
+
+  // Resize handle
+  const rh = e.target.closest('.rh');
+  if (rh && (e.button === 0 || e.touches)) {
+    const wid = parseInt(rh.dataset.wid);
+    const state = windows.find(w => w.id === wid);
+    if (state && !state.isMaximized) {
+      const r = state.el.getBoundingClientRect();
+      resize = { state, dir: rh.dataset.dir, sx: pos.x, sy: pos.y, sl: r.left, st: r.top, sw: r.width, sh: r.height };
+      document.body.classList.add('busy');
+      if (!e.touches) e.preventDefault();
+    }
+  }
+}
+
+function onPointerMove(e) {
+  const pos = getPointerPos(e);
+  if (drag) {
+    drag.state.el.style.left = (pos.x - drag.ox) + 'px';
+    drag.state.el.style.top  = clampTop(pos.y - drag.oy) + 'px';
+    if (e.touches) e.preventDefault();
+  }
+  if (resize) {
+    const { state, dir, sx, sy, sl, st, sw, sh } = resize;
+    const dx = pos.x - sx, dy = pos.y - sy;
+    let l = sl, t = st, w = sw, h = sh;
+    if (dir.includes('e')) w = Math.max(MIN_W, sw + dx);
+    if (dir.includes('s')) h = Math.max(MIN_H, sh + dy);
+    if (dir.includes('w')) { const nw = Math.max(MIN_W, sw-dx); l = sl+sw-nw; w = nw; }
+    if (dir.includes('n')) { const nh = Math.max(MIN_H, sh-dy); t = clampTop(st+sh-nh); h = nh; }
+    state.el.style.left = l+'px'; state.el.style.top = t+'px';
+    state.el.style.width = w+'px'; state.el.style.height = h+'px';
+    if (e.touches) e.preventDefault();
+  }
+}
+
+function onPointerUp() {
+  drag = resize = null;
+  document.body.classList.remove('busy');
+}
+
+document.addEventListener('mousedown', onPointerDown);
+document.addEventListener('mousemove', onPointerMove);
+document.addEventListener('mouseup',   onPointerUp);
+document.addEventListener('touchstart', onPointerDown, { passive: false });
+document.addEventListener('touchmove',  onPointerMove, { passive: false });
+document.addEventListener('touchend',   onPointerUp);
+
+
+// ── Snap Assist ──
+// After a non-full snap, show thumbnails of other windows to fill the empty zone
+let snapAssistTarget = null; // the window that was just snapped
+
+function showSnapAssist(snappedState, layout) {
+  // Don't show for full/third snaps — only half/2-3 splits make sense
+  const splitsOnly = ['left-half','right-half','left-2-3','right-2-3','left-third','center-third','right-third','quad-tl','quad-tr','quad-bl','quad-br'];
+  if (!splitsOnly.includes(layout)) return;
+
+  const othersRaw = windows.filter(w => w.id !== snappedState.id && !w.isMinimized);
+  if (othersRaw.length === 0) return;
+
+  snapAssistTarget = snappedState;
+
+  // Compute the empty zone (opposite side)
+  const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
+  let zoneL, zoneT, zoneW, zoneH;
+  const snapped = getRect(snappedState.el);
+
+  // Empty zone is the complementary area
+  if (layout === 'left-half')    { zoneL=vw/2;    zoneT=0; zoneW=vw/2;     zoneH=vh; }
+  else if (layout === 'right-half')   { zoneL=0;       zoneT=0; zoneW=vw/2;     zoneH=vh; }
+  else if (layout === 'left-2-3')     { zoneL=vw*2/3;  zoneT=0; zoneW=vw/3;     zoneH=vh; }
+  else if (layout === 'right-2-3')    { zoneL=0;       zoneT=0; zoneW=vw/3;     zoneH=vh; }
+  else if (layout === 'left-third')   { zoneL=vw/3;    zoneT=0; zoneW=vw*2/3;   zoneH=vh; }
+  else if (layout === 'right-third')  { zoneL=0;       zoneT=0; zoneW=vw*2/3;   zoneH=vh; }
+  else if (layout === 'center-third') { zoneL=0;       zoneT=0; zoneW=vw/3;     zoneH=vh; }
+  else if (layout === 'quad-tl')      { zoneL=vw/2;    zoneT=0; zoneW=vw/2;     zoneH=vh; }
+  else if (layout === 'quad-tr')      { zoneL=0;       zoneT=0; zoneW=vw/2;     zoneH=vh; }
+  else if (layout === 'quad-bl')      { zoneL=vw/2;    zoneT=0; zoneW=vw/2;     zoneH=vh; }
+  else if (layout === 'quad-br')      { zoneL=0;       zoneT=0; zoneW=vw/2;     zoneH=vh; }
+  else return;
+
+  // Build overlay
+  const overlay = document.getElementById('snap-assist');
+  overlay.innerHTML = '';
+
+  // Zone container
+  const zoneEl = document.createElement('div');
+  zoneEl.className = 'sa-zone';
+  zoneEl.style.cssText = `left:${zoneL}px;top:${zoneT}px;width:${zoneW}px;height:${zoneH}px;`;
+
+  const panel = document.createElement('div');
+  panel.className = 'sa-panel';
+
+  othersRaw.forEach(w => {
+    const thumb = document.createElement('div');
+    thumb.className = 'sa-thumb';
+
+    // Try to show a scaled iframe preview
+    const frame = document.getElementById('wframe-'+w.id);
+    let previewHTML = '';
+    try {
+      // We can't clone cross-origin iframes, so always use swatch
+      throw new Error('use swatch');
+    } catch(_) {
+      previewHTML = `<div class="sa-thumb-swatch"><span>&#xE774;</span></div>`;
+    }
+
+    const titleEl = document.getElementById('wt-'+w.id);
+    const title = titleEl ? titleEl.textContent : 'Window';
+
+    thumb.innerHTML = previewHTML + `<div class="sa-thumb-title"><span>${title}</span></div>`;
+
+    thumb.addEventListener('click', () => {
+      hideSnapAssist();
+      // Snap the clicked window to the complement zone
+      const fn = SNAP_FNS_COMPLEMENT[layout];
+      if (fn) {
+        w.preMax = getRect(w.el);
+        const [l2,t2,w2,h2,r2] = fn();
+        applyRect(w.el, l2, t2, w2, h2, r2, true);
+        w.isMaximized = false;
+        w.el.classList.remove('maximized');
+        document.getElementById('wmax-ico-'+w.id).textContent = '\uE922';
+        focusWindow(w.id);
+      }
+    });
+
+    panel.appendChild(thumb);
+  });
+
+  zoneEl.appendChild(panel);
+  overlay.appendChild(zoneEl);
+  overlay.classList.add('show');
+  document.getElementById('sa-dismiss').style.display = 'block';
+
+  // Auto-dismiss after 5s
+  clearTimeout(overlay._dismissTimer);
+  overlay._dismissTimer = setTimeout(hideSnapAssist, 5000);
+}
+
+function hideSnapAssist() {
+  document.getElementById('snap-assist').classList.remove('show');
+  document.getElementById('sa-dismiss').style.display = 'none';
+  snapAssistTarget = null;
+}
+
+// Complement snap zones (where the other window goes)
+const SNAP_FNS_COMPLEMENT = {
+  'left-half':    () => [window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
+  'right-half':   () => [0, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
+  'left-2-3':     () => [window.innerWidth*2/3, 0, window.innerWidth/3, window.innerHeight-TASKBAR_H, '8px'],
+  'right-2-3':    () => [0, 0, window.innerWidth/3, window.innerHeight-TASKBAR_H, '8px'],
+  'left-third':   () => [window.innerWidth/3, 0, window.innerWidth*2/3, window.innerHeight-TASKBAR_H, '8px'],
+  'right-third':  () => [0, 0, window.innerWidth*2/3, window.innerHeight-TASKBAR_H, '8px'],
+  'center-third': () => [window.innerWidth*2/3, 0, window.innerWidth/3, window.innerHeight-TASKBAR_H, '8px'],
+  'quad-tl':      () => [window.innerWidth/2, 0, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
+  'quad-tr':      () => [0, 0, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
+  'quad-bl':      () => [window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
+  'quad-br':      () => [0, (window.innerHeight-TASKBAR_H)/2, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
+};
+
+// Dismiss snap assist on any window interaction
+document.addEventListener('mousedown', () => {
+  if (document.getElementById('snap-assist').classList.contains('show')) hideSnapAssist();
+}, true);
+
+// ── Open buttons ──
 document.getElementById('tb-new-btn').addEventListener('click', openPickerWindow);
-document.getElementById('desktop-open-btn').addEventListener('click', openPickerWindow);
+document.getElementById('desk-open').addEventListener('click', openPickerWindow);
 </script>
+
+<!-- Snap assist dismiss layer -->
+<div id="sa-dismiss" style="display:none;position:fixed;inset:0;bottom:48px;z-index:4999;" onclick="hideSnapAssist()"></div>
+<!-- Snap assist overlay -->
+<div id="snap-assist"></div>
 </body>
 </html>
