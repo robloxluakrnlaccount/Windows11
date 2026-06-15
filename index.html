@@ -76,7 +76,7 @@ input, textarea { user-select: text; -webkit-user-select: text; touch-action: au
 .tb-app.minimized { background: rgba(255,255,255,0.07); }
 .tb-app-icon {
   font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 16px; color: #fff; line-height: 1; flex-shrink: 0;
+  font-size: 14px; color: #fff; line-height: 1; flex-shrink: 0;
 }
 .tb-app-title {
   font-size: 11.5px; color: rgba(255,255,255,0.88);
@@ -108,7 +108,7 @@ input, textarea { user-select: text; -webkit-user-select: text; touch-action: au
   border-radius: 4px; cursor: pointer; transition: background 0.1s;
 }
 .tray-icon:hover { background: rgba(255,255,255,0.1); }
-.tray-icon span { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 11px; color: rgba(255,255,255,0.92); line-height: 1; }
+.tray-icon span { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 12px; color: rgba(255,255,255,0.92); line-height: 1; }
 .tray-clock {
   display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
   padding: 0 10px 0 6px; height: 40px; cursor: pointer; border-radius: 4px; transition: background 0.1s;
@@ -276,6 +276,19 @@ body.busy #blocker { display:block; }
 .papp-btn.go { background: #0078d4; color: #fff; border-color: #0078d4; }
 .papp-btn.go:hover { background: #106ebe; }
 
+
+/* ── Taskbar pill animation ── */
+@keyframes pill-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pill-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(10px) scale(0.8); }
+}
+.tb-app { animation: pill-in 0.2s cubic-bezier(0.2,0,0,1) both; }
+.tb-app.removing { animation: pill-out 0.16s cubic-bezier(0.4,0,1,1) both; }
+
 /* Mobile: on small screens make windows full height, taskbar bigger touch targets */
 @media (max-width: 600px) {
   .tb-app-title { display: none; }
@@ -364,6 +377,95 @@ body.busy #blocker { display:block; }
   position: fixed; inset: 0; bottom: 48px;
   z-index: 4999;
 }
+
+/* ── Task Hack (Task Manager style) ── */
+#taskhack {
+  display: none;
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 420px; max-height: 70vh;
+  background: rgba(22,22,32,0.96);
+  backdrop-filter: blur(32px) saturate(160%);
+  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  z-index: 30000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Segoe UI VF', sans-serif;
+}
+#taskhack.show { display: flex; }
+
+.th-titlebar {
+  height: 38px; background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; padding: 0 14px; gap: 8px;
+  flex-shrink: 0;
+}
+.th-title-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 14px; color: #60cdff; }
+.th-title-txt { font-size: 13px; color: rgba(255,255,255,0.9); flex: 1; font-weight: 500; }
+.th-close {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; cursor: pointer; transition: background 0.1s;
+  font-family: 'Segoe Fluent Icons', sans-serif; font-size: 10px; color: rgba(255,255,255,0.7);
+}
+.th-close:hover { background: #c42b1c; color: #fff; }
+
+.th-header {
+  display: flex; padding: 8px 14px 6px; gap: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.th-col { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.th-col-name { flex: 1; }
+.th-col-act  { width: 80px; text-align: right; }
+
+.th-list { overflow-y: auto; flex: 1; }
+.th-row {
+  display: flex; align-items: center; padding: 0 14px;
+  height: 44px; gap: 10px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.08s;
+}
+.th-row:hover { background: rgba(255,255,255,0.06); }
+.th-row:hover .th-end-btn { opacity: 1; }
+.th-row-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 16px; color: #60cdff; flex-shrink: 0; }
+.th-row-name { flex: 1; font-size: 12.5px; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th-row-status { font-size: 11px; color: rgba(255,255,255,0.4); width: 50px; text-align: right; }
+.th-end-btn {
+  width: 72px; height: 26px; border-radius: 4px; border: none; cursor: pointer;
+  background: #c42b1c; color: #fff; font-size: 11px; font-weight: 600;
+  font-family: 'Segoe UI VF', sans-serif;
+  opacity: 0; transition: opacity 0.12s, background 0.1s;
+  flex-shrink: 0;
+}
+.th-end-btn:hover { background: #d93025; }
+.th-end-btn:active { background: #b02010; }
+
+.th-empty {
+  padding: 32px 0; text-align: center;
+  font-size: 13px; color: rgba(255,255,255,0.3);
+}
+
+/* Controller indicator */
+#ctrl-badge {
+  position: fixed; bottom: 56px; right: 12px;
+  background: rgba(20,20,30,0.88);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 5px 10px;
+  font-size: 11px; color: rgba(255,255,255,0.7);
+  display: none; align-items: center; gap: 6px;
+  z-index: 9999; font-family: 'Segoe UI VF', sans-serif;
+  transition: opacity 0.3s;
+}
+#ctrl-badge.show { display: flex; }
+#ctrl-badge-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 14px; color: #60cdff; }
+
+/* Controller focus ring */
+.ctrl-focus { outline: 2px solid #60cdff !important; outline-offset: 2px; }
+
 </style>
 </head>
 <body>
@@ -372,6 +474,10 @@ body.busy #blocker { display:block; }
   <div class="desktop-icon" id="desk-open">
     <span class="di-ico">&#xE753;</span>
     <span class="di-lbl">Open App</span>
+  </div>
+  <div class="desktop-icon" id="desk-taskhack" style="top:110px;">
+    <span class="di-ico" style="color:#f87171;">&#xE81E;</span>
+    <span class="di-lbl">Task Hack</span>
   </div>
 </div>
 
@@ -578,19 +684,26 @@ function unminimize(state) {
   focusWindow(state.id);
 }
 
-function closeWindow(id) {
+function closeWindow(id, instant) {
   const idx = windows.findIndex(w => w.id === id);
   if (idx === -1) return;
   const state = windows[idx];
-  state.el.style.transition = 'opacity 0.1s, transform 0.1s';
-  state.el.style.opacity = '0';
-  state.el.style.transform = 'scale(0.97)';
-  setTimeout(() => {
-    state.el.remove();
-    document.getElementById('tb-pill-'+id)?.remove();
-  }, 115);
   windows.splice(idx, 1);
   if (windows.length > 0) focusWindow(windows[windows.length-1].id);
+  // Animate pill out
+  const pill = document.getElementById('tb-pill-'+id);
+  if (pill) {
+    pill.classList.add('removing');
+    setTimeout(() => pill.remove(), 160);
+  }
+  if (instant) {
+    state.el.remove();
+  } else {
+    state.el.style.transition = 'opacity 0.1s, transform 0.1s';
+    state.el.style.opacity = '0';
+    state.el.style.transform = 'scale(0.97)';
+    setTimeout(() => state.el.remove(), 115);
+  }
 }
 
 function addTaskbarPill(id, title) {
@@ -1136,10 +1249,238 @@ document.addEventListener('mousedown', () => {
   if (document.getElementById('snap-assist').classList.contains('show')) hideSnapAssist();
 }, true);
 
+
+// ── Task Hack ──
+let thDragState = null;
+
+function openTaskHack() {
+  const th = document.getElementById('taskhack');
+  th.classList.add('show');
+  refreshTaskHack();
+  // drag titlebar
+  document.getElementById('th-titlebar').onmousedown = (e) => {
+    if (e.target.id === 'th-close-btn') return;
+    const r = th.getBoundingClientRect();
+    thDragState = { ox: e.clientX - r.left, oy: e.clientY - r.top };
+    e.preventDefault();
+  };
+}
+
+function closeTaskHack() {
+  document.getElementById('taskhack').classList.remove('show');
+}
+
+function refreshTaskHack() {
+  const list = document.getElementById('th-list');
+  if (windows.length === 0) {
+    list.innerHTML = '<div class="th-empty">No running apps</div>';
+    return;
+  }
+  list.innerHTML = '';
+  windows.forEach(w => {
+    const titleEl = document.getElementById('wt-'+w.id);
+    const name = titleEl ? titleEl.textContent : 'Window '+w.id;
+    const row = document.createElement('div');
+    row.className = 'th-row';
+    row.innerHTML = `
+      <span class="th-row-ico">&#xE774;</span>
+      <span class="th-row-name">${name}</span>
+      <span class="th-row-status">${w.isMinimized ? 'Min' : 'Running'}</span>
+      <button class="th-end-btn" data-kill="${w.id}">End</button>`;
+    list.appendChild(row);
+  });
+}
+
+document.addEventListener('mousemove', e => {
+  if (thDragState) {
+    const th = document.getElementById('taskhack');
+    th.style.left = (e.clientX - thDragState.ox) + 'px';
+    th.style.top  = (e.clientY - thDragState.oy) + 'px';
+    th.style.transform = 'none';
+  }
+});
+document.addEventListener('mouseup', () => { thDragState = null; });
+
+// th-close handled via delegation below
+
+// th-list handled via delegation below
+
+// desk-taskhack handled via delegation below
+
+// Auto-refresh task hack list when windows change
+const _origClose = closeWindow;
+// (already patched above with instant flag)
+
+// ── Gamepad / Controller Support ──
+let gpIndex = null;
+let gpRAF = null;
+let gpActive = false;
+let ctrlFocusIdx = -1; // index into focusable desktop elements
+
+// Focusable elements for controller nav
+function getCtrlTargets() {
+  return [
+    document.getElementById('desk-open'),
+    document.getElementById('desk-taskhack'),
+    document.getElementById('tb-new-btn'),
+    ...Array.from(document.querySelectorAll('.tb-app')),
+    ...Array.from(document.querySelectorAll('.wbtn')),
+  ].filter(Boolean);
+}
+
+function ctrlSetFocus(idx) {
+  const targets = getCtrlTargets();
+  targets.forEach(t => t.classList.remove('ctrl-focus'));
+  if (idx < 0 || idx >= targets.length) { ctrlFocusIdx = -1; return; }
+  ctrlFocusIdx = idx;
+  targets[idx].classList.add('ctrl-focus');
+  targets[idx].scrollIntoView({ block: 'nearest' });
+}
+
+function ctrlClick() {
+  const targets = getCtrlTargets();
+  if (ctrlFocusIdx >= 0 && ctrlFocusIdx < targets.length) {
+    targets[ctrlFocusIdx].click();
+  }
+}
+
+// Deadzone helper
+function deadzone(v, dz) { return Math.abs(v) > dz ? v : 0; }
+
+let gpPrev = { up:false, down:false, left:false, right:false, a:false, b:false, start:false };
+let gpRepeat = null;
+
+function gpLoop() {
+  const gp = navigator.getGamepads ? navigator.getGamepads()[gpIndex] : null;
+  if (!gp) { gpRAF = requestAnimationFrame(gpLoop); return; }
+
+  const axisX = deadzone(gp.axes[0], 0.3);
+  const axisY = deadzone(gp.axes[1], 0.3);
+
+  const up    = gp.buttons[12]?.pressed || axisY < -0.3;
+  const down  = gp.buttons[13]?.pressed || axisY >  0.3;
+  const left  = gp.buttons[14]?.pressed || axisX < -0.3;
+  const right = gp.buttons[15]?.pressed || axisX >  0.3;
+  const a     = gp.buttons[0]?.pressed;   // A / cross = confirm
+  const b     = gp.buttons[1]?.pressed;   // B / circle = back/close
+  const start = gp.buttons[9]?.pressed;   // Start = Task Hack
+
+  const targets = getCtrlTargets();
+  const count = targets.length;
+
+  // D-pad / stick navigation
+  if ((right || down) && !gpPrev.right && !gpPrev.down) {
+    ctrlSetFocus(Math.min(ctrlFocusIdx + 1, count - 1));
+  }
+  if ((left || up) && !gpPrev.left && !gpPrev.up) {
+    ctrlSetFocus(Math.max(ctrlFocusIdx - 1, 0));
+  }
+
+  // A button = click focused
+  if (a && !gpPrev.a) ctrlClick();
+
+  // B button = close focused window
+  if (b && !gpPrev.b) {
+    const focused = windows.find(w => w.el.classList.contains('focused'));
+    if (focused) closeWindow(focused.id);
+  }
+
+  // Start = toggle Task Hack
+  if (start && !gpPrev.start) {
+    const th = document.getElementById('taskhack');
+    if (th.classList.contains('show')) closeTaskHack(); else openTaskHack();
+  }
+
+  // Left stick for dragging focused window (when holding LB = button[4])
+  const lb = gp.buttons[4]?.pressed;
+  if (lb) {
+    const focused = windows.find(w => w.el.classList.contains('focused'));
+    if (focused && !focused.isMaximized) {
+      const speed = 8;
+      const curL = parseFloat(focused.el.style.left) || 0;
+      const curT = parseFloat(focused.el.style.top)  || 0;
+      focused.el.style.left = (curL + axisX * speed) + 'px';
+      focused.el.style.top  = clampTop(curT + axisY * speed) + 'px';
+    }
+  }
+
+  gpPrev = { up, down, left, right, a, b, start };
+  gpRAF = requestAnimationFrame(gpLoop);
+}
+
+window.addEventListener('gamepadconnected', e => {
+  gpIndex = e.gamepad.index;
+  gpActive = true;
+  const badge = document.getElementById('ctrl-badge');
+  document.getElementById('ctrl-badge-txt').textContent = e.gamepad.id.slice(0,28) + ' connected';
+  badge.classList.add('show');
+  setTimeout(() => badge.classList.remove('show'), 3000);
+  if (gpRAF) cancelAnimationFrame(gpRAF);
+  gpRAF = requestAnimationFrame(gpLoop);
+  ctrlSetFocus(0);
+});
+
+window.addEventListener('gamepaddisconnected', e => {
+  if (e.gamepad.index === gpIndex) {
+    gpIndex = null; gpActive = false;
+    if (gpRAF) cancelAnimationFrame(gpRAF);
+    const badge = document.getElementById('ctrl-badge');
+    document.getElementById('ctrl-badge-txt').textContent = 'Controller disconnected';
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 2500);
+    getCtrlTargets().forEach(t => t.classList.remove('ctrl-focus'));
+  }
+});
+
+// ── Delegated handlers for dynamically-injected elements ──
+document.addEventListener('click', e => {
+  // Task Hack close button
+  if (e.target.id === 'th-close-btn' || e.target.closest('#th-close-btn')) {
+    closeTaskHack(); return;
+  }
+  // Task Hack kill button
+  const killBtn = e.target.closest('[data-kill]');
+  if (killBtn) {
+    const id = parseInt(killBtn.dataset.kill);
+    closeWindow(id, true);
+    setTimeout(refreshTaskHack, 50);
+    return;
+  }
+  // Desktop Task Hack icon
+  if (e.target.closest('#desk-taskhack')) {
+    const th = document.getElementById('taskhack');
+    if (th) {
+      if (th.classList.contains('show')) closeTaskHack(); else openTaskHack();
+    }
+    return;
+  }
+});
+
 // ── Open buttons ──
 document.getElementById('tb-new-btn').addEventListener('click', openPickerWindow);
 document.getElementById('desk-open').addEventListener('click', openPickerWindow);
 </script>
+
+
+<!-- Controller badge -->
+<div id="ctrl-badge">
+  <span id="ctrl-badge-ico">&#xE7FC;</span>
+  <span id="ctrl-badge-txt">Controller connected</span>
+</div>
+
+<!-- Task Hack -->
+<div id="taskhack">
+  <div class="th-titlebar" id="th-titlebar">
+    <span class="th-title-ico">&#xE81E;</span>
+    <span class="th-title-txt">Task Hack</span>
+    <div class="th-close" id="th-close-btn">&#xE8BB;</div>
+  </div>
+  <div class="th-header">
+    <span class="th-col th-col-name">Name</span>
+    <span class="th-col th-col-act">Action</span>
+  </div>
+  <div class="th-list" id="th-list"></div>
+</div>
 
 <!-- Snap assist dismiss layer -->
 <div id="sa-dismiss" style="display:none;position:fixed;inset:0;bottom:48px;z-index:4999;" onclick="hideSnapAssist()"></div>
