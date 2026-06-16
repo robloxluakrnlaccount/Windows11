@@ -127,12 +127,9 @@ input, textarea { user-select: text; -webkit-user-select: text; touch-action: au
   display: flex; flex-direction: column;
   overflow: visible;
   z-index: 1000;
-  /* Size/position transitions driven by JS */
 }
 .win11-window.focused { z-index: 1001; }
 .win11-window.hidden { display: none !important; }
-
-/* Maximized: square corner on close btn */
 .win11-window.maximized .wbtn:last-child { border-radius: 0 !important; }
 
 /* ── Titlebar ── */
@@ -221,14 +218,14 @@ body.busy #blocker { display:block; }
 .di-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 32px; color: #fff; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
 .di-lbl { font-size: 11.5px; color: #fff; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,0.7); line-height: 1.3; }
 
-/* ── Picker app (rendered directly in window, not iframe) ── */
+/* ── Picker app ── */
 .papp {
   width: 100%; height: 100%; background: #f3f3f3;
   display: flex; flex-direction: column; overflow: hidden;
   border-radius: 0 0 8px 8px;
 }
 .papp-body { flex: 1; padding: 22px 26px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
-.papp-heading { font-size: 20px; font-weight: 300; color: #1a1a1a; font-family: 'Segoe UI VF', sans-serif; font-weight: 300; }
+.papp-heading { font-size: 20px; font-weight: 300; color: #1a1a1a; font-family: 'Segoe UI VF', sans-serif; }
 .papp-tabs { display: flex; border-bottom: 1px solid #d0d0d0; }
 .papp-tab {
   padding: 7px 18px; font-size: 13px; color: #555; cursor: pointer;
@@ -276,7 +273,6 @@ body.busy #blocker { display:block; }
 .papp-btn.go { background: #0078d4; color: #fff; border-color: #0078d4; }
 .papp-btn.go:hover { background: #106ebe; }
 
-
 /* ── Taskbar pill animation ── */
 @keyframes pill-in {
   from { opacity: 0; transform: translateY(10px) scale(0.8); }
@@ -289,183 +285,276 @@ body.busy #blocker { display:block; }
 .tb-app { animation: pill-in 0.2s cubic-bezier(0.2,0,0,1) both; }
 .tb-app.removing { animation: pill-out 0.16s cubic-bezier(0.4,0,1,1) both; }
 
-/* Mobile: on small screens make windows full height, taskbar bigger touch targets */
 @media (max-width: 600px) {
   .tb-app-title { display: none; }
   .tb-app { min-width: 44px; max-width: 44px; }
   .tray-date { display: none; }
-  .rh { display: none; } /* no resize handles on mobile */
+  .rh { display: none; }
 }
 
 /* ── Snap Assist overlay ── */
 #snap-assist {
-  display: none;
-  position: fixed; inset: 0; bottom: 48px;
-  z-index: 5000;
-  pointer-events: none;
+  display: none; position: fixed; inset: 0; bottom: 48px;
+  z-index: 5000; pointer-events: none;
 }
 #snap-assist.show { display: block; }
-
 .sa-zone {
-  position: absolute;
-  display: flex; align-items: center; justify-content: center;
+  position: absolute; display: flex; align-items: center; justify-content: center;
   pointer-events: all;
 }
-
 .sa-panel {
   background: rgba(30,30,40,0.82);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 10px;
-  display: flex; flex-wrap: wrap; gap: 8px;
-  max-width: 420px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+  padding: 10px; display: flex; flex-wrap: wrap; gap: 8px;
+  max-width: 420px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
 }
-
 .sa-thumb {
-  width: 120px; height: 80px;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  border: 2px solid transparent;
-  transition: border-color 0.1s, transform 0.1s;
-  flex-shrink: 0;
-  background: #2a2a3a;
+  width: 120px; height: 80px; border-radius: 6px; overflow: hidden;
+  cursor: pointer; position: relative; border: 2px solid transparent;
+  transition: border-color 0.1s, transform 0.1s; flex-shrink: 0; background: #2a2a3a;
 }
 .sa-thumb:hover { border-color: #0078d4; transform: scale(1.04); }
-
-.sa-thumb-preview {
-  width: 100%; height: calc(100% - 20px);
-  overflow: hidden; position: relative;
-  border-radius: 4px 4px 0 0;
-}
-.sa-thumb-preview iframe {
-  width: 300%; height: 300%;
-  border: none;
-  transform: scale(0.333);
-  transform-origin: 0 0;
-  pointer-events: none;
-}
-
-/* Fallback color swatch when iframe preview unavailable */
 .sa-thumb-swatch {
   width: 100%; height: calc(100% - 20px);
   background: linear-gradient(135deg, #2a3a5c, #1a2a4c);
   border-radius: 4px 4px 0 0;
   display: flex; align-items: center; justify-content: center;
 }
-.sa-thumb-swatch span {
-  font-family: 'Segoe Fluent Icons', sans-serif;
-  font-size: 22px; color: rgba(255,255,255,0.4);
-}
-
+.sa-thumb-swatch span { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 22px; color: rgba(255,255,255,0.4); }
 .sa-thumb-title {
   height: 20px; display: flex; align-items: center;
-  padding: 0 5px; background: rgba(0,0,0,0.3);
-  border-radius: 0 0 4px 4px;
+  padding: 0 5px; background: rgba(0,0,0,0.3); border-radius: 0 0 4px 4px;
 }
 .sa-thumb-title span {
   font-size: 10px; color: rgba(255,255,255,0.8);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   font-family: 'Segoe UI VF', sans-serif;
 }
+.sa-dismiss { position: fixed; inset: 0; bottom: 48px; z-index: 4999; }
 
-.sa-dismiss {
-  position: fixed; inset: 0; bottom: 48px;
-  z-index: 4999;
-}
-
-/* ── Task Hack (Task Manager style) ── */
-#taskhack {
-  display: none;
-  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 420px; max-height: 70vh;
-  background: rgba(22,22,32,0.96);
-  backdrop-filter: blur(32px) saturate(160%);
-  -webkit-backdrop-filter: blur(32px) saturate(160%);
+/* ── Task Hack window ── */
+#taskhack-win {
+  position: fixed;
+  width: 520px; height: 520px;
+  min-width: 380px; min-height: 340px;
+  top: 0; left: 0;
+  z-index: 1002;
+  display: none; flex-direction: column;
+  background: #1a1a24;
+  border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
-  z-index: 30000;
-  display: none;
-  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.65);
   overflow: hidden;
-  font-family: 'Segoe UI VF', sans-serif;
+  font-family: 'Segoe UI VF', system-ui, sans-serif;
 }
-#taskhack.show { display: flex; }
+#taskhack-win.show { display: flex; }
+#taskhack-win.kernel-mode {
+  /* Kernel mode: purely cosmetic — higher z-index + red border indicator.
+     Window behaviour (drag, resize, min/max) is UNCHANGED. */
+  z-index: 29999 !important;
+  border-color: rgba(248,113,113,0.4) !important;
+  box-shadow: 0 0 0 1px rgba(248,113,113,0.3), 0 0 32px rgba(248,113,113,0.1) !important;
+}
+#taskhack-win.kernel-mode .th-tb {
+  background: rgba(248,113,113,0.08) !important;
+  border-bottom-color: rgba(248,113,113,0.2) !important;
+}
+#taskhack-win.kernel-mode .th-tb-ico {
+  color: #f87171 !important;
+  animation: kernel-pulse 2s ease-in-out infinite;
+}
+@keyframes kernel-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+#taskhack-win.always-on-top { z-index: 29999 !important; }
 
-.th-titlebar {
-  height: 38px; background: rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex; align-items: center; padding: 0 14px; gap: 8px;
-  flex-shrink: 0;
+/* TH titlebar */
+.th-tb {
+  height: 36px; min-height: 36px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; padding: 0 0 0 12px;
+  gap: 6px; flex-shrink: 0; cursor: default;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
 }
-.th-title-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 14px; color: #60cdff; }
-.th-title-txt { font-size: 13px; color: rgba(255,255,255,0.9); flex: 1; font-weight: 500; }
-.th-close {
-  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-  border-radius: 4px; cursor: pointer; transition: background 0.1s;
+.th-tb-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 13px; color: #f87171; flex-shrink: 0; }
+.th-tb-title { font-size: 12px; color: rgba(255,255,255,0.85); flex: 1; font-weight: 500; font-family: 'Segoe UI VF', system-ui, sans-serif; }
+.th-wbtn {
+  width: 40px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: transparent; cursor: pointer;
   font-family: 'Segoe Fluent Icons', sans-serif; font-size: 10px; color: rgba(255,255,255,0.7);
+  border-radius: 0; transition: background 0.08s; flex-shrink: 0;
 }
-.th-close:hover { background: #c42b1c; color: #fff; }
+.th-wbtn:hover { background: rgba(255,255,255,0.1); }
+.th-wbtn.th-closebtn:hover { background: #c42b1c; color: #fff; }
+/* Kernel mode font override — system default only */
+#taskhack-win.kernel-mode,
+#taskhack-win.kernel-mode .th-tb-title,
+#taskhack-win.kernel-mode .th-setting-name,
+#taskhack-win.kernel-mode .th-setting-desc,
+#taskhack-win.kernel-mode .th-row-name,
+#taskhack-win.kernel-mode .th-row-status,
+#taskhack-win.kernel-mode .th-col-h,
+#taskhack-win.kernel-mode .th-empty { font-family: system-ui, sans-serif; }
 
-.th-header {
-  display: flex; padding: 8px 14px 6px; gap: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  flex-shrink: 0;
+/* TH sidebar nav */
+.th-body { display: flex; flex: 1; overflow: hidden; }
+.th-nav {
+  width: 44px; background: rgba(255,255,255,0.03);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 0; gap: 2px; flex-shrink: 0;
 }
-.th-col { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.th-col-name { flex: 1; }
-.th-col-act  { width: 80px; text-align: right; }
+.th-nav-btn {
+  width: 36px; height: 36px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.1s; position: relative;
+  font-family: 'Segoe Fluent Icons', sans-serif; font-size: 15px;
+  color: rgba(255,255,255,0.5);
+}
+.th-nav-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); }
+.th-nav-btn.active { background: rgba(255,255,255,0.12); color: #60cdff; }
+.th-nav-btn::after {
+  content: attr(data-tip);
+  position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%);
+  background: #2a2a3a; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 5px; padding: 4px 8px; font-size: 11px; color: #fff;
+  white-space: nowrap; opacity: 0; pointer-events: none;
+  font-family: 'Segoe UI VF', sans-serif; transition: opacity 0.1s; z-index: 9;
+}
+.th-nav-btn:hover::after { opacity: 1; }
+
+/* TH pages */
+.th-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.th-page.active { display: flex; }
+
+/* Processes page */
+.th-proc-header {
+  display: flex; padding: 10px 16px 6px; gap: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
+}
+.th-col-h {
+  font-size: 10.5px; color: rgba(255,255,255,0.35); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; padding: 2px 4px;
+  border-radius: 3px; transition: color 0.1s;
+}
+.th-col-h:hover { color: rgba(255,255,255,0.7); }
+.th-col-h.name-col { flex: 1; }
+.th-col-h.stat-col { width: 70px; text-align: right; }
 
 .th-list { overflow-y: auto; flex: 1; }
+.th-list::-webkit-scrollbar { width: 4px; }
+.th-list::-webkit-scrollbar-track { background: transparent; }
+.th-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
 .th-row {
-  display: flex; align-items: center; padding: 0 14px;
-  height: 44px; gap: 10px; cursor: pointer;
+  display: flex; align-items: center; padding: 0 16px;
+  height: 42px; gap: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.04);
-  transition: background 0.08s;
+  transition: background 0.07s;
 }
-.th-row:hover { background: rgba(255,255,255,0.06); }
+.th-row:hover { background: rgba(255,255,255,0.05); }
 .th-row:hover .th-end-btn { opacity: 1; }
-.th-row-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 16px; color: #60cdff; flex-shrink: 0; }
-.th-row-name { flex: 1; font-size: 12.5px; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.th-row-status { font-size: 11px; color: rgba(255,255,255,0.4); width: 50px; text-align: right; }
+.th-row-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 15px; color: #60cdff; flex-shrink: 0; }
+.th-row-name { flex: 1; font-size: 12.5px; color: rgba(255,255,255,0.82); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th-row-status { font-size: 11px; color: rgba(255,255,255,0.35); width: 70px; text-align: right; }
 .th-end-btn {
-  width: 72px; height: 26px; border-radius: 4px; border: none; cursor: pointer;
-  background: #c42b1c; color: #fff; font-size: 11px; font-weight: 600;
+  height: 24px; padding: 0 10px; border-radius: 4px; border: none; cursor: pointer;
+  background: rgba(196,43,28,0.8); color: #fff; font-size: 11px; font-weight: 600;
   font-family: 'Segoe UI VF', sans-serif;
-  opacity: 0; transition: opacity 0.12s, background 0.1s;
-  flex-shrink: 0;
+  opacity: 0; transition: opacity 0.1s, background 0.1s; flex-shrink: 0;
 }
-.th-end-btn:hover { background: #d93025; }
-.th-end-btn:active { background: #b02010; }
+.th-end-btn:hover { background: #c42b1c; }
+.th-empty { padding: 40px 0; text-align: center; font-size: 13px; color: rgba(255,255,255,0.28); }
 
-.th-empty {
-  padding: 32px 0; text-align: center;
-  font-size: 13px; color: rgba(255,255,255,0.3);
+/* Settings page */
+.th-settings { padding: 16px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+.th-settings-group { margin-bottom: 8px; }
+.th-settings-group-title {
+  font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 700; margin-bottom: 6px; padding: 0 2px;
 }
+.th-setting-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 7px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 3px; border: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.1s;
+}
+.th-setting-row:hover { background: rgba(255,255,255,0.07); }
+.th-setting-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 16px; flex-shrink: 0; }
+.th-setting-info { flex: 1; }
+.th-setting-name { font-size: 13px; color: rgba(255,255,255,0.88); }
+.th-setting-desc { font-size: 11px; color: rgba(255,255,255,0.38); margin-top: 2px; }
+.th-toggle {
+  width: 40px; height: 22px; border-radius: 11px;
+  background: rgba(255,255,255,0.15); position: relative;
+  cursor: pointer; flex-shrink: 0; transition: background 0.2s; border: none;
+}
+.th-toggle::after {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; top: 3px; left: 3px;
+  transition: transform 0.2s cubic-bezier(0.2,0,0,1);
+}
+.th-toggle.on { background: #0078d4; }
+.th-toggle.on::after { transform: translateX(18px); }
 
-/* Controller indicator */
+/* ── Controller mode picker dialog ── */
+#ctrl-picker {
+  display: none; position: fixed; inset: 0; z-index: 50000;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+}
+#ctrl-picker.show { display: flex; }
+.ctrl-picker-box {
+  background: #1e1e2e; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px; padding: 28px 28px 24px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.65);
+  width: 400px; font-family: 'Segoe UI VF', sans-serif;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.ctrl-picker-title { font-size: 16px; color: #fff; font-weight: 500; }
+.ctrl-picker-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: -10px; }
+.ctrl-picker-options { display: flex; gap: 10px; }
+.ctrl-opt {
+  flex: 1; padding: 16px 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1);
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  transition: border-color 0.1s, background 0.1s; text-align: center;
+}
+.ctrl-opt:hover { border-color: #0078d4; background: rgba(0,120,212,0.12); }
+.ctrl-opt-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 28px; color: #60cdff; }
+.ctrl-opt-name { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 600; }
+.ctrl-opt-desc { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* ── Virtual cursor ── */
+#virt-cursor {
+  display: none; position: fixed; width: 20px; height: 20px; pointer-events: none;
+  z-index: 60000; transform: translate(-2px, -2px);
+}
+#virt-cursor.show { display: block; }
+#virt-cursor svg { width: 100%; height: 100%; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+
+/* Controller badge */
 #ctrl-badge {
   position: fixed; bottom: 56px; right: 12px;
-  background: rgba(20,20,30,0.88);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px; padding: 5px 10px;
+  background: rgba(20,20,30,0.92); backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px;
   font-size: 11px; color: rgba(255,255,255,0.7);
-  display: none; align-items: center; gap: 6px;
+  display: none; align-items: center; gap: 8px;
   z-index: 9999; font-family: 'Segoe UI VF', sans-serif;
-  transition: opacity 0.3s;
 }
 #ctrl-badge.show { display: flex; }
 #ctrl-badge-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 14px; color: #60cdff; }
 
 /* Controller focus ring */
 .ctrl-focus { outline: 2px solid #60cdff !important; outline-offset: 2px; }
-
 </style>
 </head>
 <body>
@@ -499,10 +588,118 @@ body.busy #blocker { display:block; }
     <div class="tray-icon" title="Volume"><span>&#xE767;</span></div>
     <div class="tray-clock">
       <div class="tray-time" id="clock-time">12:00 PM</div>
-      <div class="tray-date" id="clock-date">6/14/2026</div>
+      <div class="tray-date" id="clock-date">6/15/2026</div>
     </div>
   </div>
 </div>
+
+<!-- Task Hack window -->
+<div id="taskhack-win">
+  <div class="th-tb" id="th-tb">
+    <span class="th-tb-ico">&#xE81E;</span>
+    <span class="th-tb-title">Task Hack</span>
+    <button class="th-wbtn" id="th-min-btn" title="Minimize">&#xE921;</button>
+    <button class="th-wbtn" id="th-max-btn" title="Maximize">&#xE922;</button>
+    <button class="th-wbtn th-closebtn" id="th-close-btn" title="Close">&#xE8BB;</button>
+  </div>
+  <div class="th-body">
+    <div class="th-nav">
+      <div class="th-nav-btn active" data-thpage="processes" data-tip="Processes">&#xE81E;</div>
+      <div class="th-nav-btn" data-thpage="settings" data-tip="Settings">&#xE713;</div>
+    </div>
+    <div class="th-page active" id="thpage-processes">
+      <div class="th-proc-header">
+        <span class="th-col-h name-col">Name</span>
+        <span class="th-col-h stat-col">Status</span>
+        <span class="th-col-h stat-col"></span>
+      </div>
+      <div class="th-list" id="th-list"></div>
+    </div>
+    <div class="th-page" id="thpage-settings">
+      <div class="th-settings">
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Window</div>
+          <div class="th-setting-row">
+            <span class="th-setting-ico" style="color:#60cdff;">&#xE78B;</span>
+            <div class="th-setting-info">
+              <div class="th-setting-name">Always on top</div>
+              <div class="th-setting-desc">Task Hack stays above all other windows</div>
+            </div>
+            <button class="th-toggle" data-setting="aot"></button>
+          </div>
+        </div>
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Mode</div>
+          <div class="th-setting-row">
+            <span class="th-setting-ico" style="color:#f87171;">&#xE81E;</span>
+            <div class="th-setting-info">
+              <div class="th-setting-name">Kernel mode</div>
+              <div class="th-setting-desc">Runs at elevated priority above all windows. Red border indicates active. Window behaviour unchanged.</div>
+            </div>
+            <button class="th-toggle" data-setting="kernel"></button>
+          </div>
+        </div>
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Behaviour</div>
+          <div class="th-setting-row">
+            <span class="th-setting-ico" style="color:#fbbf24;">&#xE8F4;</span>
+            <div class="th-setting-info">
+              <div class="th-setting-name">Instant kill</div>
+              <div class="th-setting-desc">Windows disappear immediately with no animation</div>
+            </div>
+            <button class="th-toggle on" data-setting="instant"></button>
+          </div>
+          <div class="th-setting-row">
+            <span class="th-setting-ico" style="color:#a78bfa;">&#xE72C;</span>
+            <div class="th-setting-info">
+              <div class="th-setting-name">Auto-refresh</div>
+              <div class="th-setting-desc">Automatically update the process list</div>
+            </div>
+            <button class="th-toggle on" data-setting="autorefresh"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Controller mode picker -->
+<div id="ctrl-picker">
+  <div class="ctrl-picker-box">
+    <div class="ctrl-picker-title">&#xE7FC;&nbsp; Controller detected</div>
+    <div class="ctrl-picker-sub" id="ctrl-picker-name">Gamepad</div>
+    <div class="ctrl-picker-options">
+      <div class="ctrl-opt" id="ctrl-opt-cursor">
+        <span class="ctrl-opt-ico">&#xE962;</span>
+        <span class="ctrl-opt-name">Virtual Cursor</span>
+        <span class="ctrl-opt-desc">Right stick moves a cursor, A = click, B = back</span>
+      </div>
+      <div class="ctrl-opt" id="ctrl-opt-select">
+        <span class="ctrl-opt-ico">&#xEDAD;</span>
+        <span class="ctrl-opt-name">Select Mode</span>
+        <span class="ctrl-opt-desc">D-pad navigates UI elements, A = confirm</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Virtual cursor -->
+<div id="virt-cursor">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 2L20 12L13 13.5L9 20L4 2Z" fill="white" stroke="black" stroke-width="1.2"/>
+  </svg>
+</div>
+
+<!-- Controller badge -->
+<div id="ctrl-badge">
+  <span id="ctrl-badge-ico">&#xE7FC;</span>
+  <span id="ctrl-badge-txt">Controller connected</span>
+</div>
+
+<!-- Snap assist dismiss layer -->
+<div id="sa-dismiss" style="display:none;position:fixed;inset:0;bottom:48px;z-index:4999;" onclick="hideSnapAssist()"></div>
+<!-- Snap assist overlay -->
+<div id="snap-assist"></div>
 
 <script>
 // ── Clock ──
@@ -533,7 +730,6 @@ const MIN_W = 300, MIN_H = 180;
 let windows = [];
 let nextId = 1;
 let drag = null, resize = null;
-let activePointers = {};
 
 function clampTop(t) { return Math.max(0, Math.min(t, window.innerHeight - TASKBAR_H - 32)); }
 
@@ -550,22 +746,17 @@ function focusWindow(id) {
   if (pill) { pill.classList.remove('minimized'); pill.classList.add('active'); }
 }
 
-// ── applyRect: set final size/pos immediately, animate visually via clip trick ──
 function applyRect(el, l, t, w, h, radius, animate) {
   if (animate) {
-    // Capture current rendered rect
     const from = el.getBoundingClientRect();
-    // Apply final values immediately (layout done)
     el.style.left   = l + 'px'; el.style.top    = t + 'px';
     el.style.width  = w + 'px'; el.style.height = h + 'px';
     el.style.borderRadius = radius !== undefined ? radius : '8px';
-    // Now animate from old position using transform
     const toRect = el.getBoundingClientRect();
     const dx = from.left - toRect.left;
     const dy = from.top  - toRect.top;
     const sx = from.width  / toRect.width;
     const sy = from.height / toRect.height;
-    // Start at old visual position
     el.style.transition = 'none';
     el.style.transform = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
     el.style.transformOrigin = '0 0';
@@ -586,10 +777,25 @@ function applyRect(el, l, t, w, h, radius, animate) {
 }
 
 function getRect(el) {
-  return { left: parseFloat(el.style.left), top: parseFloat(el.style.top), width: parseFloat(el.style.width), height: parseFloat(el.style.height) };
+  // Fall back to getBoundingClientRect if inline styles aren't set yet
+  // (handles TH window which starts with CSS transform centering)
+  let l = parseFloat(el.style.left);
+  let t = parseFloat(el.style.top);
+  let w = parseFloat(el.style.width);
+  let h = parseFloat(el.style.height);
+  if (isNaN(l) || isNaN(t) || isNaN(w) || isNaN(h)) {
+    const r = el.getBoundingClientRect();
+    if (isNaN(l)) l = r.left;
+    if (isNaN(t)) t = r.top;
+    if (isNaN(w)) w = r.width;
+    if (isNaN(h)) h = r.height;
+    el.style.left = l + 'px'; el.style.top = t + 'px';
+    el.style.width = w + 'px'; el.style.height = h + 'px';
+    el.style.transform = 'none';
+  }
+  return { left: l, top: t, width: w, height: h };
 }
 
-// ── Maximize / Restore ──
 function maximize(state) {
   state.preMax = getRect(state.el);
   applyRect(state.el, 0, 0, window.innerWidth, window.innerHeight - TASKBAR_H, '0px', true);
@@ -606,7 +812,6 @@ function restoreMax(state) {
 }
 function toggleMax(state) { if (state.isMaximized) restoreMax(state); else maximize(state); }
 
-// Snap layouts
 const SNAP_FNS = {
   'full':         () => [0, 0, window.innerWidth, window.innerHeight-TASKBAR_H, '0px'],
   'left-half':    () => [0, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
@@ -622,7 +827,6 @@ const SNAP_FNS = {
   'quad-br':      () => [window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
 };
 
-// ── Minimize: animate toward taskbar pill ──
 function getPillCenter(id) {
   const pill = document.getElementById('tb-pill-'+id);
   if (!pill) return { x: window.innerWidth/2, y: window.innerHeight - TASKBAR_H/2 };
@@ -634,19 +838,16 @@ function minimize(state) {
   state.isMinimized = true;
   const pill = document.getElementById('tb-pill-'+state.id);
   if (pill) { pill.classList.remove('active'); pill.classList.add('minimized'); }
-
   const target = getPillCenter(state.id);
   const winRect = state.el.getBoundingClientRect();
   const winCX = winRect.left + winRect.width/2;
   const winCY = winRect.top  + winRect.height/2;
   const dx = target.x - winCX;
   const dy = target.y - winCY;
-
   state.el.style.transition = 'transform 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.22s';
   state.el.style.transformOrigin = 'center center';
   state.el.style.transform = `translate(${dx}px,${dy}px) scale(0.12)`;
   state.el.style.opacity = '0';
-
   setTimeout(() => {
     state.el.classList.add('hidden');
     state.el.style.transition = '';
@@ -658,18 +859,15 @@ function minimize(state) {
 function unminimize(state) {
   state.isMinimized = false;
   const target = getPillCenter(state.id);
-  const winRect = state.el.getBoundingClientRect();
   const winCX = (parseFloat(state.el.style.left)||0) + (parseFloat(state.el.style.width)||900)/2;
   const winCY = (parseFloat(state.el.style.top)||0)  + (parseFloat(state.el.style.height)||600)/2;
   const dx = target.x - winCX;
   const dy = target.y - winCY;
-
   state.el.classList.remove('hidden');
   state.el.style.transition = 'none';
   state.el.style.transformOrigin = 'center center';
   state.el.style.transform = `translate(${dx}px,${dy}px) scale(0.12)`;
   state.el.style.opacity = '0';
-
   requestAnimationFrame(() => requestAnimationFrame(() => {
     state.el.style.transition = 'transform 0.22s cubic-bezier(0.2,0,0,1), opacity 0.22s';
     state.el.style.transform = 'none';
@@ -690,12 +888,8 @@ function closeWindow(id, instant) {
   const state = windows[idx];
   windows.splice(idx, 1);
   if (windows.length > 0) focusWindow(windows[windows.length-1].id);
-  // Animate pill out
   const pill = document.getElementById('tb-pill-'+id);
-  if (pill) {
-    pill.classList.add('removing');
-    setTimeout(() => pill.remove(), 160);
-  }
+  if (pill) { pill.classList.add('removing'); setTimeout(() => pill.remove(), 160); }
   if (instant) {
     state.el.remove();
   } else {
@@ -722,10 +916,9 @@ function addTaskbarPill(id, title) {
   document.getElementById('tb-apps').insertBefore(pill, document.getElementById('tb-new-btn'));
 }
 
-// ── Snap flyout wiring ──
 function wireSnapFlyout(id, snapBtn) {
   const snapFly = document.getElementById('snap-fly-'+id);
-  if (!snapFly || snapFly.children.length === 0) return;
+  if (!snapFly) return;
   let flyT = null, flyHT = null;
   const show = () => { clearTimeout(flyHT); clearTimeout(flyT); flyT = setTimeout(() => snapFly.classList.add('visible'), 1000); };
   const hide = () => { clearTimeout(flyT); flyHT = setTimeout(() => { if (!snapFly.matches(':hover')) snapFly.classList.remove('visible'); }, 120); };
@@ -735,7 +928,6 @@ function wireSnapFlyout(id, snapBtn) {
   snapFly.addEventListener('mouseleave', hide);
 }
 
-// ── Build snap flyout HTML ──
 function snapFlyoutHTML(id) {
   return `<div class="snap-flyout" id="snap-fly-${id}">
     <div class="snap-grid">
@@ -761,7 +953,6 @@ function snapFlyoutHTML(id) {
   </div>`;
 }
 
-// ── Create a generic window with iframe ──
 function createWindow(src, title, isUrl) {
   const id = nextId++;
   const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
@@ -799,7 +990,6 @@ function createWindow(src, title, isUrl) {
   if (isMobile) state.preMax = { left:0, top:0, width:vw, height:vh };
   windows.push(state);
 
-  // Try read iframe title
   document.getElementById('wframe-'+id).addEventListener('load', () => {
     try {
       const t2 = document.getElementById('wframe-'+id).contentDocument?.title;
@@ -815,7 +1005,6 @@ function createWindow(src, title, isUrl) {
   focusWindow(id);
   wireSnapFlyout(id, el.querySelector('.wmax'));
 
-  // Animate in
   el.style.opacity = '0'; el.style.transform = 'scale(0.96) translateY(6px)';
   requestAnimationFrame(() => requestAnimationFrame(() => {
     el.style.transition = 'opacity 0.15s, transform 0.15s cubic-bezier(0.2,0,0,1)';
@@ -907,7 +1096,6 @@ function openPickerWindow() {
   addTaskbarPill(id, 'Open');
   focusWindow(id);
 
-  // Animate in
   el.style.opacity = '0'; el.style.transform = 'scale(0.96) translateY(6px)';
   requestAnimationFrame(() => requestAnimationFrame(() => {
     el.style.transition = 'opacity 0.15s, transform 0.15s cubic-bezier(0.2,0,0,1)';
@@ -915,7 +1103,6 @@ function openPickerWindow() {
     setTimeout(() => { el.style.transition = ''; }, 170);
   }));
 
-  // File input
   const fileInput = document.getElementById('pfile-'+id);
   const zone      = document.getElementById('pzone-'+id);
   fileInput.addEventListener('change', () => {
@@ -964,7 +1151,6 @@ function pickerDoOpen(pid) {
 
 // ── Event delegation ──
 document.addEventListener('click', e => {
-  // Picker tab switch
   const ptab = e.target.closest('[data-ptab]');
   if (ptab && !e.target.closest('.snap-flyout')) {
     const pid = ptab.dataset.pid;
@@ -975,8 +1161,6 @@ document.addEventListener('click', e => {
     document.getElementById(`psec-${tab}-${pid}`)?.classList.add('active');
     return;
   }
-
-  // Picker clear file
   const pclear = e.target.closest('[data-pclear]');
   if (pclear) {
     const pid = pclear.dataset.pclear;
@@ -986,20 +1170,11 @@ document.addEventListener('click', e => {
     document.getElementById('psel-'+pid).classList.remove('show');
     return;
   }
-
-  // Picker cancel
   const pcancel = e.target.closest('[data-pcancel]');
-  if (pcancel) {
-    closeWindow(parseInt(pcancel.dataset.pcancel));
-    pickerState = null;
-    return;
-  }
-
-  // Picker open
+  if (pcancel) { closeWindow(parseInt(pcancel.dataset.pcancel)); pickerState = null; return; }
   const popen = e.target.closest('[data-popen]');
   if (popen) { pickerDoOpen(parseInt(popen.dataset.popen)); return; }
 
-  // Titlebar dbl-click
   if (e.detail === 2) {
     const tb = e.target.closest('.titlebar');
     if (tb && !e.target.closest('.wctrl')) {
@@ -1007,23 +1182,16 @@ document.addEventListener('click', e => {
       if (state) toggleMax(state);
     }
   }
-
-  // Maximize
   const wmaxBtn = e.target.closest('.wmax');
   if (wmaxBtn && !e.target.closest('.snap-flyout') && !e.target.closest('.snap-card')) {
     const state = windows.find(w => w.id === parseInt(wmaxBtn.dataset.wid));
     if (state) toggleMax(state);
   }
-
-  // Minimize
   const wminBtn = e.target.closest('.wmin');
   if (wminBtn) { const state = windows.find(w => w.id === parseInt(wminBtn.dataset.wid)); if (state) minimize(state); }
-
-  // Close
   const wcloseBtn = e.target.closest('.wclose');
   if (wcloseBtn) { closeWindow(parseInt(wcloseBtn.dataset.wid)); }
 
-  // Snap card
   const scard = e.target.closest('.snap-card');
   if (scard) {
     const wid = parseInt(scard.dataset.wid);
@@ -1043,9 +1211,12 @@ document.addEventListener('click', e => {
       }
     }
   }
-}, true); // use capture so ptab fires before stopPropagation
 
-// Enter key in URL input
+  // Controller mode picker
+  if (e.target.closest('#ctrl-opt-cursor')) { setControllerMode('cursor'); return; }
+  if (e.target.closest('#ctrl-opt-select')) { setControllerMode('select'); return; }
+}, true);
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.classList.contains('papp-urlinput')) {
     const pid = e.target.id.replace('purl-','');
@@ -1053,7 +1224,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── Pointer events for drag + resize (mouse & touch) ──
+// ── Pointer events for drag + resize ──
 function getPointerPos(e) {
   if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
   return { x: e.clientX, y: e.clientY };
@@ -1061,15 +1232,11 @@ function getPointerPos(e) {
 
 function onPointerDown(e) {
   const pos = getPointerPos(e);
-
-  // Focus clicked window
   const winEl = e.target.closest('.win11-window');
   if (winEl) {
     const id = parseInt(winEl.id.replace('win-',''));
     if (!e.target.closest('.wbtn') && !e.target.closest('.snap-flyout') && !e.target.closest('.rh')) focusWindow(id);
   }
-
-  // Titlebar drag
   const tb = e.target.closest('.titlebar');
   if (tb && !e.target.closest('.wctrl') && (e.button === 0 || e.touches)) {
     const wid = parseInt(tb.dataset.wid);
@@ -1082,8 +1249,6 @@ function onPointerDown(e) {
     }
     return;
   }
-
-  // Resize handle
   const rh = e.target.closest('.rh');
   if (rh && (e.button === 0 || e.touches)) {
     const wid = parseInt(rh.dataset.wid);
@@ -1118,10 +1283,7 @@ function onPointerMove(e) {
   }
 }
 
-function onPointerUp() {
-  drag = resize = null;
-  document.body.classList.remove('busy');
-}
+function onPointerUp() { drag = resize = null; document.body.classList.remove('busy'); }
 
 document.addEventListener('mousedown', onPointerDown);
 document.addEventListener('mousemove', onPointerMove);
@@ -1130,27 +1292,17 @@ document.addEventListener('touchstart', onPointerDown, { passive: false });
 document.addEventListener('touchmove',  onPointerMove, { passive: false });
 document.addEventListener('touchend',   onPointerUp);
 
-
 // ── Snap Assist ──
-// After a non-full snap, show thumbnails of other windows to fill the empty zone
-let snapAssistTarget = null; // the window that was just snapped
+let snapAssistTarget = null;
 
 function showSnapAssist(snappedState, layout) {
-  // Don't show for full/third snaps — only half/2-3 splits make sense
   const splitsOnly = ['left-half','right-half','left-2-3','right-2-3','left-third','center-third','right-third','quad-tl','quad-tr','quad-bl','quad-br'];
   if (!splitsOnly.includes(layout)) return;
-
   const othersRaw = windows.filter(w => w.id !== snappedState.id && !w.isMinimized);
   if (othersRaw.length === 0) return;
-
   snapAssistTarget = snappedState;
-
-  // Compute the empty zone (opposite side)
   const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
   let zoneL, zoneT, zoneW, zoneH;
-  const snapped = getRect(snappedState.el);
-
-  // Empty zone is the complementary area
   if (layout === 'left-half')    { zoneL=vw/2;    zoneT=0; zoneW=vw/2;     zoneH=vh; }
   else if (layout === 'right-half')   { zoneL=0;       zoneT=0; zoneW=vw/2;     zoneH=vh; }
   else if (layout === 'left-2-3')     { zoneL=vw*2/3;  zoneT=0; zoneW=vw/3;     zoneH=vh; }
@@ -1164,40 +1316,21 @@ function showSnapAssist(snappedState, layout) {
   else if (layout === 'quad-br')      { zoneL=0;       zoneT=0; zoneW=vw/2;     zoneH=vh; }
   else return;
 
-  // Build overlay
   const overlay = document.getElementById('snap-assist');
   overlay.innerHTML = '';
-
-  // Zone container
   const zoneEl = document.createElement('div');
   zoneEl.className = 'sa-zone';
   zoneEl.style.cssText = `left:${zoneL}px;top:${zoneT}px;width:${zoneW}px;height:${zoneH}px;`;
-
   const panel = document.createElement('div');
   panel.className = 'sa-panel';
-
   othersRaw.forEach(w => {
     const thumb = document.createElement('div');
     thumb.className = 'sa-thumb';
-
-    // Try to show a scaled iframe preview
-    const frame = document.getElementById('wframe-'+w.id);
-    let previewHTML = '';
-    try {
-      // We can't clone cross-origin iframes, so always use swatch
-      throw new Error('use swatch');
-    } catch(_) {
-      previewHTML = `<div class="sa-thumb-swatch"><span>&#xE774;</span></div>`;
-    }
-
     const titleEl = document.getElementById('wt-'+w.id);
     const title = titleEl ? titleEl.textContent : 'Window';
-
-    thumb.innerHTML = previewHTML + `<div class="sa-thumb-title"><span>${title}</span></div>`;
-
+    thumb.innerHTML = `<div class="sa-thumb-swatch"><span>&#xE774;</span></div><div class="sa-thumb-title"><span>${title}</span></div>`;
     thumb.addEventListener('click', () => {
       hideSnapAssist();
-      // Snap the clicked window to the complement zone
       const fn = SNAP_FNS_COMPLEMENT[layout];
       if (fn) {
         w.preMax = getRect(w.el);
@@ -1209,16 +1342,12 @@ function showSnapAssist(snappedState, layout) {
         focusWindow(w.id);
       }
     });
-
     panel.appendChild(thumb);
   });
-
   zoneEl.appendChild(panel);
   overlay.appendChild(zoneEl);
   overlay.classList.add('show');
   document.getElementById('sa-dismiss').style.display = 'block';
-
-  // Auto-dismiss after 5s
   clearTimeout(overlay._dismissTimer);
   overlay._dismissTimer = setTimeout(hideSnapAssist, 5000);
 }
@@ -1229,7 +1358,10 @@ function hideSnapAssist() {
   snapAssistTarget = null;
 }
 
-// Complement snap zones (where the other window goes)
+document.addEventListener('mousedown', () => {
+  if (document.getElementById('snap-assist').classList.contains('show')) hideSnapAssist();
+}, true);
+
 const SNAP_FNS_COMPLEMENT = {
   'left-half':    () => [window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
   'right-half':   () => [0, 0, window.innerWidth/2, window.innerHeight-TASKBAR_H, '8px'],
@@ -1244,36 +1376,96 @@ const SNAP_FNS_COMPLEMENT = {
   'quad-br':      () => [0, (window.innerHeight-TASKBAR_H)/2, window.innerWidth/2, (window.innerHeight-TASKBAR_H)/2, '8px'],
 };
 
-// Dismiss snap assist on any window interaction
-document.addEventListener('mousedown', () => {
-  if (document.getElementById('snap-assist').classList.contains('show')) hideSnapAssist();
-}, true);
-
-
-// ── Task Hack ──
-let thDragState = null;
+// ─────────────────────────────────────────────
+// Task Hack
+// ─────────────────────────────────────────────
+const thWin = document.getElementById('taskhack-win');
+let thDrag = null;
+let thIsMax = false;
+let thPreMax = null;
+let thSettings = { aot: false, kernel: false, instant: true, autorefresh: true };
+let thRefreshTimer = null;
+let thIsOpen = false;
 
 function openTaskHack() {
-  const th = document.getElementById('taskhack');
-  th.classList.add('show');
+  thIsOpen = true;
+  thWin.classList.add('show');
+  applyThSettings();
   refreshTaskHack();
-  // drag titlebar
-  document.getElementById('th-titlebar').onmousedown = (e) => {
-    if (e.target.id === 'th-close-btn') return;
-    const r = th.getBoundingClientRect();
-    thDragState = { ox: e.clientX - r.left, oy: e.clientY - r.top };
-    e.preventDefault();
-  };
+  if (thSettings.autorefresh) startThRefresh();
+  thWin.style.opacity = '0';
+  thWin.style.transform = 'scale(0.96)';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    thWin.style.transition = 'opacity 0.14s, transform 0.14s cubic-bezier(0.2,0,0,1)';
+    thWin.style.opacity = '1';
+    thWin.style.transform = 'none';
+    setTimeout(() => thWin.style.transition = '', 160);
+  }));
 }
 
 function closeTaskHack() {
-  document.getElementById('taskhack').classList.remove('show');
+  thIsOpen = false;
+  stopThRefresh();
+  // Reset kernel mode on close — it should not persist
+  if (thSettings.kernel) {
+    thSettings.kernel = false;
+    const kernelToggle = document.querySelector('.th-toggle[data-setting="kernel"]');
+    if (kernelToggle) kernelToggle.classList.remove('on');
+    thWin.classList.remove('kernel-mode');
+  }
+  thWin.style.transition = 'opacity 0.1s, transform 0.1s';
+  thWin.style.opacity = '0';
+  thWin.style.transform = 'scale(0.97)';
+  setTimeout(() => {
+    thWin.classList.remove('show');
+    thWin.style.transition = '';
+    thWin.style.opacity = '';
+    thWin.style.transform = '';
+  }, 110);
+}
+
+function minimizeTaskHack() {
+  thWin.style.transition = 'opacity 0.18s, transform 0.18s';
+  thWin.style.opacity = '0';
+  thWin.style.transform = 'translateY(20px) scale(0.95)';
+  setTimeout(() => {
+    thWin.classList.remove('show');
+    thWin.style.transition = '';
+  }, 190);
+}
+
+function maximizeTaskHack() {
+  if (thIsMax) {
+    const r = thPreMax || { left: (window.innerWidth - 520) / 2, top: (window.innerHeight - TASKBAR_H - 520) / 2, width: 520, height: 520 };
+    applyRect(thWin, r.left, r.top, r.width, r.height, '10px', true);
+    document.getElementById('th-max-btn').textContent = '\uE922';
+    thIsMax = false;
+    thWin.classList.remove('th-maximized');
+  } else {
+    thPreMax = getRect(thWin);
+    applyRect(thWin, 0, 0, window.innerWidth, window.innerHeight - TASKBAR_H, '0px', true);
+    document.getElementById('th-max-btn').textContent = '\uE923';
+    thIsMax = true;
+    thWin.classList.add('th-maximized');
+  }
+}
+
+function applyThSettings() {
+  if (thSettings.kernel) {
+    thWin.classList.add('kernel-mode');
+    thWin.style.zIndex = '10002'; // above taskbar (10000) and everything else
+  } else {
+    thWin.classList.remove('kernel-mode');
+    // aot = above taskbar; normal = just above regular focused windows
+    thWin.style.zIndex = thSettings.aot ? '10001' : '1002';
+  }
 }
 
 function refreshTaskHack() {
   const list = document.getElementById('th-list');
+  if (!list) return;
   if (windows.length === 0) {
-    list.innerHTML = '<div class="th-empty">No running apps</div>';
+    list.innerHTML = '<div class="th-empty">No running processes</div>';
     return;
   }
   list.innerHTML = '';
@@ -1285,39 +1477,106 @@ function refreshTaskHack() {
     row.innerHTML = `
       <span class="th-row-ico">&#xE774;</span>
       <span class="th-row-name">${name}</span>
-      <span class="th-row-status">${w.isMinimized ? 'Min' : 'Running'}</span>
+      <span class="th-row-status">${w.isMinimized ? 'Minimized' : 'Running'}</span>
       <button class="th-end-btn" data-kill="${w.id}">End</button>`;
     list.appendChild(row);
   });
 }
 
-document.addEventListener('mousemove', e => {
-  if (thDragState) {
-    const th = document.getElementById('taskhack');
-    th.style.left = (e.clientX - thDragState.ox) + 'px';
-    th.style.top  = (e.clientY - thDragState.oy) + 'px';
-    th.style.transform = 'none';
+function startThRefresh() { stopThRefresh(); thRefreshTimer = setInterval(refreshTaskHack, 1500); }
+function stopThRefresh()  { clearInterval(thRefreshTimer); }
+
+// TH titlebar drag — kernel mode does NOT block dragging
+document.addEventListener('mousedown', e => {
+  if (e.target.closest('#th-tb') && !e.target.closest('button') && e.button === 0) {
+    const r = thWin.getBoundingClientRect();
+    thDrag = { ox: e.clientX - r.left, oy: e.clientY - r.top };
+    e.preventDefault();
   }
 });
-document.addEventListener('mouseup', () => { thDragState = null; });
 
-// th-close handled via delegation below
+document.addEventListener('mousemove', e => {
+  // Task Hack drag — works regardless of kernel mode or always-on-top
+  if (thDrag && !thIsMax) {
+    thWin.style.left = (e.clientX - thDrag.ox) + 'px';
+    thWin.style.top  = Math.max(0, e.clientY - thDrag.oy) + 'px';
+  }
+});
+document.addEventListener('mouseup', () => { thDrag = null; });
 
-// th-list handled via delegation below
+// TH settings toggles
+document.addEventListener('click', e => {
+  const toggle = e.target.closest('.th-toggle');
+  if (toggle && toggle.dataset.setting) {
+    const key = toggle.dataset.setting;
+    thSettings[key] = !thSettings[key];
+    toggle.classList.toggle('on', thSettings[key]);
+    if (key === 'autorefresh') {
+      thSettings.autorefresh ? startThRefresh() : stopThRefresh();
+    }
+    applyThSettings();
+  }
 
-// desk-taskhack handled via delegation below
+  // TH nav tabs
+  const navBtn = e.target.closest('[data-thpage]');
+  if (navBtn) {
+    const page = navBtn.dataset.thpage;
+    document.querySelectorAll('.th-nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.th-page').forEach(p => p.classList.remove('active'));
+    navBtn.classList.add('active');
+    document.getElementById('thpage-'+page)?.classList.add('active');
+  }
 
-// Auto-refresh task hack list when windows change
-const _origClose = closeWindow;
-// (already patched above with instant flag)
+  if (e.target.id === 'th-close-btn' || e.target.closest('#th-close-btn')) { closeTaskHack(); return; }
+  if (e.target.id === 'th-min-btn')   { minimizeTaskHack(); return; }
+  if (e.target.id === 'th-max-btn')   { maximizeTaskHack(); return; }
 
-// ── Gamepad / Controller Support ──
+  // Kill process
+  const killBtn = e.target.closest('[data-kill]');
+  if (killBtn) {
+    const id = parseInt(killBtn.dataset.kill);
+    closeWindow(id, thSettings.instant);
+    setTimeout(refreshTaskHack, 50);
+    return;
+  }
+
+  // Desktop Task Hack icon
+  if (e.target.closest('#desk-taskhack')) {
+    if (thIsOpen && thWin.classList.contains('show')) closeTaskHack();
+    else openTaskHack();
+  }
+});
+
+// TH SE-corner resize grip
+thWin.addEventListener('mousedown', e => {
+  const r = thWin.getBoundingClientRect();
+  if (e.clientX > r.right - 14 && e.clientY > r.bottom - 14 && !thIsMax) {
+    const startW = r.width, startH = r.height, startX = e.clientX, startY = e.clientY;
+    const onMove = ev => {
+      thWin.style.width  = Math.max(380, startW + ev.clientX - startX) + 'px';
+      thWin.style.height = Math.max(340, startH + ev.clientY - startY) + 'px';
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
+
+// ─────────────────────────────────────────────
+// Controller / Gamepad Support
+// ─────────────────────────────────────────────
 let gpIndex = null;
 let gpRAF = null;
-let gpActive = false;
-let ctrlFocusIdx = -1; // index into focusable desktop elements
+let gpMode = null;
+let ctrlFocusIdx = -1;
+let vcX = window.innerWidth / 2, vcY = window.innerHeight / 2;
+const vcEl = document.getElementById('virt-cursor');
 
-// Focusable elements for controller nav
 function getCtrlTargets() {
   return [
     document.getElementById('desk-open'),
@@ -1325,166 +1584,149 @@ function getCtrlTargets() {
     document.getElementById('tb-new-btn'),
     ...Array.from(document.querySelectorAll('.tb-app')),
     ...Array.from(document.querySelectorAll('.wbtn')),
-  ].filter(Boolean);
+    ...Array.from(document.querySelectorAll('.th-nav-btn')),
+    ...Array.from(document.querySelectorAll('.th-end-btn')),
+  ].filter(el => el && el.offsetParent !== null);
 }
 
 function ctrlSetFocus(idx) {
-  const targets = getCtrlTargets();
-  targets.forEach(t => t.classList.remove('ctrl-focus'));
-  if (idx < 0 || idx >= targets.length) { ctrlFocusIdx = -1; return; }
+  const t = getCtrlTargets();
+  t.forEach(el => el.classList.remove('ctrl-focus'));
+  if (idx < 0 || idx >= t.length) { ctrlFocusIdx = -1; return; }
   ctrlFocusIdx = idx;
-  targets[idx].classList.add('ctrl-focus');
-  targets[idx].scrollIntoView({ block: 'nearest' });
+  t[idx].classList.add('ctrl-focus');
 }
 
-function ctrlClick() {
-  const targets = getCtrlTargets();
-  if (ctrlFocusIdx >= 0 && ctrlFocusIdx < targets.length) {
-    targets[ctrlFocusIdx].click();
+function ctrlClickAt(x, y) {
+  const els = document.elementsFromPoint(x, y);
+  for (const el of els) {
+    if (el === vcEl || el === document.body || el === document.documentElement) continue;
+    el.click(); break;
   }
 }
 
-// Deadzone helper
-function deadzone(v, dz) { return Math.abs(v) > dz ? v : 0; }
-
-let gpPrev = { up:false, down:false, left:false, right:false, a:false, b:false, start:false };
-let gpRepeat = null;
+function dz(v, d) { return Math.abs(v) > d ? v : 0; }
+let gpPrev = {};
 
 function gpLoop() {
   const gp = navigator.getGamepads ? navigator.getGamepads()[gpIndex] : null;
   if (!gp) { gpRAF = requestAnimationFrame(gpLoop); return; }
+  const ax0 = dz(gp.axes[0], 0.25);
+  const ay0 = dz(gp.axes[1], 0.25);
+  const ax2 = dz(gp.axes[2] ?? 0, 0.2);
+  const ay2 = dz(gp.axes[3] ?? 0, 0.2);
+  const btnA     = gp.buttons[0]?.pressed;
+  const btnB     = gp.buttons[1]?.pressed;
+  const btnLB    = gp.buttons[4]?.pressed;
+  const btnStart = gp.buttons[9]?.pressed;
+  const dUp    = gp.buttons[12]?.pressed || ay0 < -0.3;
+  const dDown  = gp.buttons[13]?.pressed || ay0 >  0.3;
+  const dLeft  = gp.buttons[14]?.pressed || ax0 < -0.3;
+  const dRight = gp.buttons[15]?.pressed || ax0 >  0.3;
 
-  const axisX = deadzone(gp.axes[0], 0.3);
-  const axisY = deadzone(gp.axes[1], 0.3);
-
-  const up    = gp.buttons[12]?.pressed || axisY < -0.3;
-  const down  = gp.buttons[13]?.pressed || axisY >  0.3;
-  const left  = gp.buttons[14]?.pressed || axisX < -0.3;
-  const right = gp.buttons[15]?.pressed || axisX >  0.3;
-  const a     = gp.buttons[0]?.pressed;   // A / cross = confirm
-  const b     = gp.buttons[1]?.pressed;   // B / circle = back/close
-  const start = gp.buttons[9]?.pressed;   // Start = Task Hack
-
-  const targets = getCtrlTargets();
-  const count = targets.length;
-
-  // D-pad / stick navigation
-  if ((right || down) && !gpPrev.right && !gpPrev.down) {
-    ctrlSetFocus(Math.min(ctrlFocusIdx + 1, count - 1));
-  }
-  if ((left || up) && !gpPrev.left && !gpPrev.up) {
-    ctrlSetFocus(Math.max(ctrlFocusIdx - 1, 0));
-  }
-
-  // A button = click focused
-  if (a && !gpPrev.a) ctrlClick();
-
-  // B button = close focused window
-  if (b && !gpPrev.b) {
-    const focused = windows.find(w => w.el.classList.contains('focused'));
-    if (focused) closeWindow(focused.id);
-  }
-
-  // Start = toggle Task Hack
-  if (start && !gpPrev.start) {
-    const th = document.getElementById('taskhack');
-    if (th.classList.contains('show')) closeTaskHack(); else openTaskHack();
-  }
-
-  // Left stick for dragging focused window (when holding LB = button[4])
-  const lb = gp.buttons[4]?.pressed;
-  if (lb) {
-    const focused = windows.find(w => w.el.classList.contains('focused'));
-    if (focused && !focused.isMaximized) {
-      const speed = 8;
-      const curL = parseFloat(focused.el.style.left) || 0;
-      const curT = parseFloat(focused.el.style.top)  || 0;
-      focused.el.style.left = (curL + axisX * speed) + 'px';
-      focused.el.style.top  = clampTop(curT + axisY * speed) + 'px';
+  if (gpMode === 'cursor') {
+    const speed = 10;
+    vcX = Math.max(0, Math.min(window.innerWidth,  vcX + ax2 * speed));
+    vcY = Math.max(0, Math.min(window.innerHeight, vcY + ay2 * speed));
+    vcEl.style.left = vcX + 'px'; vcEl.style.top = vcY + 'px';
+    if (btnA && !gpPrev.btnA) ctrlClickAt(vcX, vcY);
+    if (btnB && !gpPrev.btnB) {
+      const fw = windows.find(w => w.el.classList.contains('focused'));
+      if (fw) closeWindow(fw.id);
+    }
+    if (btnLB) {
+      const fw = windows.find(w => w.el.classList.contains('focused'));
+      if (fw && !fw.isMaximized) {
+        fw.el.style.left = (parseFloat(fw.el.style.left) + ax0 * 8) + 'px';
+        fw.el.style.top  = clampTop(parseFloat(fw.el.style.top) + ay0 * 8) + 'px';
+      }
     }
   }
 
-  gpPrev = { up, down, left, right, a, b, start };
+  if (gpMode === 'select') {
+    const tgts = getCtrlTargets();
+    if (dRight && !gpPrev.dRight) ctrlSetFocus(Math.min(ctrlFocusIdx + 1, tgts.length - 1));
+    if (dLeft  && !gpPrev.dLeft)  ctrlSetFocus(Math.max(ctrlFocusIdx - 1, 0));
+    if (dDown  && !gpPrev.dDown)  ctrlSetFocus(Math.min(ctrlFocusIdx + 3, tgts.length - 1));
+    if (dUp    && !gpPrev.dUp)    ctrlSetFocus(Math.max(ctrlFocusIdx - 3, 0));
+    if (btnA   && !gpPrev.btnA)   tgts[ctrlFocusIdx]?.click();
+    if (btnB   && !gpPrev.btnB) {
+      const fw = windows.find(w => w.el.classList.contains('focused'));
+      if (fw) closeWindow(fw.id);
+    }
+    if (btnLB) {
+      const fw = windows.find(w => w.el.classList.contains('focused'));
+      if (fw && !fw.isMaximized) {
+        fw.el.style.left = (parseFloat(fw.el.style.left) + ax0 * 8) + 'px';
+        fw.el.style.top  = clampTop(parseFloat(fw.el.style.top) + ay0 * 8) + 'px';
+      }
+    }
+  }
+
+  if (btnStart && !gpPrev.btnStart) {
+    if (thIsOpen && thWin.classList.contains('show')) closeTaskHack(); else openTaskHack();
+  }
+
+  gpPrev = { btnA, btnB, btnLB, btnStart, dUp, dDown, dLeft, dRight };
+  gpRAF = requestAnimationFrame(gpLoop);
+}
+
+function showCtrlBadge(msg, duration) {
+  const badge = document.getElementById('ctrl-badge');
+  document.getElementById('ctrl-badge-txt').textContent = msg;
+  badge.classList.add('show');
+  clearTimeout(badge._t);
+  badge._t = setTimeout(() => badge.classList.remove('show'), duration || 3000);
+}
+
+function setControllerMode(mode) {
+  gpMode = mode;
+  document.getElementById('ctrl-picker').classList.remove('show');
+  if (mode === 'cursor') {
+    vcEl.classList.add('show');
+    vcX = window.innerWidth / 2; vcY = window.innerHeight / 2;
+    vcEl.style.left = vcX + 'px'; vcEl.style.top = vcY + 'px';
+    showCtrlBadge('Virtual cursor mode — right stick to move, A to click', 3500);
+  } else {
+    vcEl.classList.remove('show');
+    ctrlSetFocus(0);
+    showCtrlBadge('Select mode — D-pad to navigate, A to confirm', 3500);
+  }
+  if (gpRAF) cancelAnimationFrame(gpRAF);
   gpRAF = requestAnimationFrame(gpLoop);
 }
 
 window.addEventListener('gamepadconnected', e => {
   gpIndex = e.gamepad.index;
-  gpActive = true;
-  const badge = document.getElementById('ctrl-badge');
-  document.getElementById('ctrl-badge-txt').textContent = e.gamepad.id.slice(0,28) + ' connected';
-  badge.classList.add('show');
-  setTimeout(() => badge.classList.remove('show'), 3000);
-  if (gpRAF) cancelAnimationFrame(gpRAF);
-  gpRAF = requestAnimationFrame(gpLoop);
-  ctrlSetFocus(0);
+  const name = e.gamepad.id.slice(0, 32);
+  document.getElementById('ctrl-picker-name').textContent = name;
+  document.getElementById('ctrl-picker').classList.add('show');
+  showCtrlBadge(name + ' connected', 2500);
 });
 
 window.addEventListener('gamepaddisconnected', e => {
   if (e.gamepad.index === gpIndex) {
-    gpIndex = null; gpActive = false;
-    if (gpRAF) cancelAnimationFrame(gpRAF);
-    const badge = document.getElementById('ctrl-badge');
-    document.getElementById('ctrl-badge-txt').textContent = 'Controller disconnected';
-    badge.classList.add('show');
-    setTimeout(() => badge.classList.remove('show'), 2500);
+    gpIndex = null; gpMode = null;
+    if (gpRAF) { cancelAnimationFrame(gpRAF); gpRAF = null; }
+    vcEl.classList.remove('show');
     getCtrlTargets().forEach(t => t.classList.remove('ctrl-focus'));
-  }
-});
-
-// ── Delegated handlers for dynamically-injected elements ──
-document.addEventListener('click', e => {
-  // Task Hack close button
-  if (e.target.id === 'th-close-btn' || e.target.closest('#th-close-btn')) {
-    closeTaskHack(); return;
-  }
-  // Task Hack kill button
-  const killBtn = e.target.closest('[data-kill]');
-  if (killBtn) {
-    const id = parseInt(killBtn.dataset.kill);
-    closeWindow(id, true);
-    setTimeout(refreshTaskHack, 50);
-    return;
-  }
-  // Desktop Task Hack icon
-  if (e.target.closest('#desk-taskhack')) {
-    const th = document.getElementById('taskhack');
-    if (th) {
-      if (th.classList.contains('show')) closeTaskHack(); else openTaskHack();
-    }
-    return;
+    showCtrlBadge('Controller disconnected', 2500);
   }
 });
 
 // ── Open buttons ──
 document.getElementById('tb-new-btn').addEventListener('click', openPickerWindow);
 document.getElementById('desk-open').addEventListener('click', openPickerWindow);
+
+// ── Init Task Hack position (pixel values so getRect always works) ──
+(function() {
+  const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
+  const w = 520, h = 520;
+  thWin.style.left  = Math.round((vw - w) / 2) + 'px';
+  thWin.style.top   = Math.round((vh - h) / 2) + 'px';
+  thWin.style.width = w + 'px';
+  thWin.style.height= h + 'px';
+})();
 </script>
-
-
-<!-- Controller badge -->
-<div id="ctrl-badge">
-  <span id="ctrl-badge-ico">&#xE7FC;</span>
-  <span id="ctrl-badge-txt">Controller connected</span>
-</div>
-
-<!-- Task Hack -->
-<div id="taskhack">
-  <div class="th-titlebar" id="th-titlebar">
-    <span class="th-title-ico">&#xE81E;</span>
-    <span class="th-title-txt">Task Hack</span>
-    <div class="th-close" id="th-close-btn">&#xE8BB;</div>
-  </div>
-  <div class="th-header">
-    <span class="th-col th-col-name">Name</span>
-    <span class="th-col th-col-act">Action</span>
-  </div>
-  <div class="th-list" id="th-list"></div>
-</div>
-
-<!-- Snap assist dismiss layer -->
-<div id="sa-dismiss" style="display:none;position:fixed;inset:0;bottom:48px;z-index:4999;" onclick="hideSnapAssist()"></div>
-<!-- Snap assist overlay -->
-<div id="snap-assist"></div>
 </body>
 </html>
