@@ -568,6 +568,10 @@ body.busy #blocker { display:block; }
     <span class="di-ico" style="color:#f87171;">&#xE81E;</span>
     <span class="di-lbl">Task Hack</span>
   </div>
+  <div class="desktop-icon" id="desk-settings" style="top:200px;">
+    <span class="di-ico" style="color:#60cdff;">&#xE713;</span>
+    <span class="di-lbl">Settings</span>
+  </div>
 </div>
 
 <div id="blocker"></div>
@@ -705,12 +709,15 @@ body.busy #blocker { display:block; }
 // ── Clock ──
 function updateClock() {
   const now = new Date();
-  const h = now.getHours(), m = now.getMinutes();
+  const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
   const ampm = h >= 12 ? 'PM' : 'AM';
-  document.getElementById('clock-time').textContent = (h%12||12) + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  let time = (h%12||12) + ':' + String(m).padStart(2,'0');
+  if (window.shellSettings && window.shellSettings.clockSeconds) time += ':' + String(s).padStart(2,'0');
+  time += ' ' + ampm;
+  document.getElementById('clock-time').textContent = time;
   document.getElementById('clock-date').textContent = (now.getMonth()+1)+'/'+now.getDate()+'/'+now.getFullYear();
 }
-updateClock(); setInterval(updateClock, 15000);
+updateClock(); window._clockInterval = setInterval(updateClock, 15000);
 
 // ── Network ──
 function updateNet() {
@@ -1717,6 +1724,118 @@ window.addEventListener('gamepaddisconnected', e => {
 // ── Open buttons ──
 document.getElementById('tb-new-btn').addEventListener('click', openPickerWindow);
 document.getElementById('desk-open').addEventListener('click', openPickerWindow);
+
+// ── Settings icon ──
+let settingsWindowId = null;
+document.getElementById('desk-settings').addEventListener('click', () => openSettingsWindow());
+
+function openSettingsWindow() {
+  // If already open, focus it
+  if (settingsWindowId !== null) {
+    const existing = windows.find(w => w.id === settingsWindowId);
+    if (existing) {
+      if (existing.isMinimized) unminimize(existing);
+      else focusWindow(existing.id);
+      return;
+    }
+  }
+  const state = createWindow('https://robloxluakrnlaccount.github.io/11Settings', 'Settings', true);
+  settingsWindowId = state.id;
+  // Update icon to settings gear
+  const pill = document.getElementById('tb-pill-' + state.id);
+  if (pill) pill.querySelector('.tb-app-icon').textContent = '\uE713';
+  const titlebarIco = state.el.querySelector('.tb-app-ico');
+  if (titlebarIco) { titlebarIco.textContent = '\uE713'; titlebarIco.style.color = '#0078d4'; }
+}
+
+// ── Shell settings state ──
+var shellSettings = {
+  bgUrl: 'https://blogs.windows.com/wp-content/uploads/sites/2/2021/10/Windows-11-Bloom-Screensaver-Dark-scaled.jpg',
+  tbOpacity: 72,
+  tbBlur: 40,
+  tbAccentRgb: '20,20,30',
+  clockSeconds: false,
+  snapFlyout: true,
+  animations: true,
+};
+
+function applyShellSettings() {
+  const bg = shellSettings.bgUrl
+    ? `url('${shellSettings.bgUrl}') center/cover no-repeat`
+    : `#1a1a24`;
+  document.getElementById('desktop').style.background = bg;
+  const op = shellSettings.tbOpacity / 100;
+  const blur = shellSettings.tbBlur;
+  const rgb = shellSettings.tbAccentRgb;
+  document.getElementById('taskbar').style.background = `rgba(${rgb},${op})`;
+  document.getElementById('taskbar').style.backdropFilter = `blur(${blur}px) saturate(180%)`;
+  document.getElementById('taskbar').style.webkitBackdropFilter = `blur(${blur}px) saturate(180%)`;
+}
+
+// (updateClock is defined earlier and reads shellSettings.clockSeconds via the var above)
+
+// ── postMessage handler from settings iframe ──
+window.addEventListener('message', e => {
+  if (!e.data || e.data.source !== '11settings') return;
+  const { type, payload } = e.data;
+
+  if (type === 'ready') {
+    // Sync current settings to the settings page
+    const settingsFrame = settingsWindowId !== null
+      ? document.getElementById('wframe-' + settingsWindowId)
+      : null;
+    if (settingsFrame) {
+      settingsFrame.contentWindow.postMessage({
+        source: '11shell',
+        settings: {
+          bgUrl: shellSettings.bgUrl,
+          tbOpacity: shellSettings.tbOpacity,
+          tbBlur: shellSettings.tbBlur,
+          clockSeconds: shellSettings.clockSeconds,
+          snapFlyout: shellSettings.snapFlyout,
+          animations: shellSettings.animations,
+        }
+      }, '*');
+    }
+  }
+
+  if (type === 'set-background') {
+    shellSettings.bgUrl = payload.url;
+    applyShellSettings();
+  }
+  if (type === 'set-accent') {
+    shellSettings.tbAccentRgb = payload.rgb;
+    applyShellSettings();
+  }
+  if (type === 'set-taskbar-opacity') {
+    shellSettings.tbOpacity = payload.value;
+    applyShellSettings();
+  }
+  if (type === 'set-taskbar-blur') {
+    shellSettings.tbBlur = payload.value;
+    applyShellSettings();
+  }
+  if (type === 'set-clock-seconds') {
+    shellSettings.clockSeconds = payload.enabled;
+    // restart clock at 1s interval when seconds shown, 15s otherwise
+    clearInterval(window._clockInterval);
+    window._clockInterval = setInterval(updateClock, shellSettings.clockSeconds ? 1000 : 15000);
+    updateClock();
+  }
+  if (type === 'set-snap-flyout') {
+    shellSettings.snapFlyout = payload.enabled;
+    // hide/show snap flyouts via CSS
+    let style = document.getElementById('snap-flyout-override');
+    if (!style) { style = document.createElement('style'); style.id = 'snap-flyout-override'; document.head.appendChild(style); }
+    style.textContent = shellSettings.snapFlyout ? '' : '.snap-flyout { display: none !important; }';
+  }
+  if (type === 'set-animations') {
+    shellSettings.animations = payload.enabled;
+    let style = document.getElementById('anim-override');
+    if (!style) { style = document.createElement('style'); style.id = 'anim-override'; document.head.appendChild(style); }
+    style.textContent = shellSettings.animations ? '' : '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  }
+});
 
 // ── Init Task Hack position (pixel values so getRect always works) ──
 (function() {
