@@ -163,6 +163,30 @@ input, textarea { user-select: text; -webkit-user-select: text; touch-action: au
 .wbtn.wclose:hover .wbtn-ico { color: #fff; }
 .wbtn.wclose:active { background: #b4261a; }
 
+/* ── Shell dark mode: window chrome ── */
+html.shell-dark .win11-window { background: #202020; }
+html.shell-dark .titlebar { background: #2b2b2b; border-bottom-color: #3a3a3a; }
+html.shell-dark .tb-title-text { color: #f0f0f0; }
+html.shell-dark .tb-app-ico { color: #60cdff; }
+html.shell-dark .wbtn-ico { color: #e8e8e8; }
+html.shell-dark .wbtn:hover { background: rgba(255,255,255,0.08); }
+html.shell-dark .wbtn:active { background: rgba(255,255,255,0.14); }
+html.shell-dark .papp { background: #202020; }
+html.shell-dark .papp-heading { color: #f0f0f0; }
+html.shell-dark .papp-tabs { border-bottom-color: #3a3a3a; }
+html.shell-dark .papp-tab { color: #aaa; }
+html.shell-dark .papp-tab:hover { color: #fff; }
+html.shell-dark .papp-lbl { color: #aaa; }
+html.shell-dark .papp-filezone { background: #2b2b2b; border-color: #444; }
+html.shell-dark .pz-txt { color: #ddd; }
+html.shell-dark .pz-sub { color: #888; }
+html.shell-dark .papp-sel { background: #2b2b2b; border-color: #444; }
+html.shell-dark .psel-name { color: #eee; }
+html.shell-dark .papp-urlinput { background: #2b2b2b; border-color: #444; color: #eee; }
+html.shell-dark .papp-footer { background: #202020; border-top-color: #3a3a3a; }
+html.shell-dark .papp-btn.cancel { background: #2b2b2b; border-color: #444; color: #eee; }
+html.shell-dark .papp-btn.cancel:hover { background: #333; }
+
 /* ── Snap flyout ── */
 .snap-flyout {
   position: absolute; top: 100%; right: -8px; width: 300px;
@@ -1757,6 +1781,7 @@ var shellSettings = {
   clockSeconds: false,
   snapFlyout: true,
   animations: true,
+  darkMode: false,
 };
 
 function applyShellSettings() {
@@ -1770,6 +1795,10 @@ function applyShellSettings() {
   document.getElementById('taskbar').style.background = `rgba(${rgb},${op})`;
   document.getElementById('taskbar').style.backdropFilter = `blur(${blur}px) saturate(180%)`;
   document.getElementById('taskbar').style.webkitBackdropFilter = `blur(${blur}px) saturate(180%)`;
+}
+
+function applyDarkMode() {
+  document.documentElement.classList.toggle('shell-dark', shellSettings.darkMode);
 }
 
 // (updateClock is defined earlier and reads shellSettings.clockSeconds via the var above)
@@ -1791,9 +1820,11 @@ window.addEventListener('message', e => {
           bgUrl: shellSettings.bgUrl,
           tbOpacity: shellSettings.tbOpacity,
           tbBlur: shellSettings.tbBlur,
+          tbAccentRgb: shellSettings.tbAccentRgb,
           clockSeconds: shellSettings.clockSeconds,
           snapFlyout: shellSettings.snapFlyout,
           animations: shellSettings.animations,
+          darkMode: shellSettings.darkMode,
         }
       }, '*');
     }
@@ -1834,6 +1865,10 @@ window.addEventListener('message', e => {
     let style = document.getElementById('anim-override');
     if (!style) { style = document.createElement('style'); style.id = 'anim-override'; document.head.appendChild(style); }
     style.textContent = shellSettings.animations ? '' : '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  }
+  if (type === 'set-dark-mode') {
+    shellSettings.darkMode = payload.enabled;
+    applyDarkMode();
   }
 });
 
