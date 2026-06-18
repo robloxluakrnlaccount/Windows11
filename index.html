@@ -596,6 +596,10 @@ body.busy #blocker { display:block; }
     <span class="di-ico" style="color:#60cdff;">&#xE713;</span>
     <span class="di-lbl">Settings</span>
   </div>
+  <div class="desktop-icon" id="desk-vm" style="top:290px;">
+    <span class="di-ico" style="color:#a78bfa;">&#xE7F8;</span>
+    <span class="di-lbl">Virtual Machine</span>
+  </div>
 </div>
 
 <div id="blocker"></div>
@@ -633,6 +637,7 @@ body.busy #blocker { display:block; }
   <div class="th-body">
     <div class="th-nav">
       <div class="th-nav-btn active" data-thpage="processes" data-tip="Processes">&#xE81E;</div>
+      <div class="th-nav-btn" data-thpage="vm" data-tip="Virtual Machine">&#xE7F8;</div>
       <div class="th-nav-btn" data-thpage="settings" data-tip="Settings">&#xE713;</div>
     </div>
     <div class="th-page active" id="thpage-processes">
@@ -642,6 +647,39 @@ body.busy #blocker { display:block; }
         <span class="th-col-h stat-col"></span>
       </div>
       <div class="th-list" id="th-list"></div>
+    </div>
+    <div class="th-page" id="thpage-vm">
+      <div class="th-settings">
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Open Virtual Machines</div>
+          <div id="th-vm-list" class="th-list" style="max-height:120px;"></div>
+        </div>
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Guest Clock</div>
+          <div class="th-setting-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
+            <div class="th-setting-info" style="width:100%;">
+              <div class="th-setting-name">Override VM time</div>
+              <div class="th-setting-desc">Sets the clock inside every open VM window. Leave blank to let it run on real time.</div>
+            </div>
+            <div style="display:flex; gap:6px; width:100%;">
+              <input type="datetime-local" id="th-vm-datetime" style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#eee; padding:6px 8px; font-size:12px; font-family:'Segoe UI VF',sans-serif;">
+              <button class="papp-btn go" id="th-vm-time-apply" style="padding:6px 14px;">Set</button>
+            </div>
+          </div>
+        </div>
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Launch app inside VMs</div>
+          <div class="th-setting-row" style="gap:8px;">
+            <button class="papp-btn cancel" data-vmlaunch="taskhack" style="flex:1;">Task Hack</button>
+            <button class="papp-btn cancel" data-vmlaunch="settings" style="flex:1;">Settings</button>
+            <button class="papp-btn cancel" data-vmlaunch="vm" style="flex:1;">Nested VM</button>
+          </div>
+        </div>
+        <div class="th-settings-group">
+          <div class="th-settings-group-title">Danger zone</div>
+          <button class="papp-btn cancel" id="th-vm-closeall" style="width:100%; color:#f87171; border-color:rgba(248,113,113,0.4);">Close all windows in every VM</button>
+        </div>
+      </div>
     </div>
     <div class="th-page" id="thpage-settings">
       <div class="th-settings">
@@ -662,13 +700,13 @@ body.busy #blocker { display:block; }
             <span class="th-setting-ico" style="color:#f87171;">&#xE81E;</span>
             <div class="th-setting-info">
               <div class="th-setting-name">Kernel mode</div>
-              <div class="th-setting-desc">Runs at elevated priority above all windows. Red border indicates active. Window behaviour unchanged.</div>
+              <div class="th-setting-desc">Runs at elevated priority above all windows. Red border indicates active. Window behavior unchanged.</div>
             </div>
             <button class="th-toggle" data-setting="kernel"></button>
           </div>
         </div>
         <div class="th-settings-group">
-          <div class="th-settings-group-title">Behaviour</div>
+          <div class="th-settings-group-title">Behavior</div>
           <div class="th-setting-row">
             <span class="th-setting-ico" style="color:#fbbf24;">&#xE8F4;</span>
             <div class="th-setting-info">
@@ -730,9 +768,77 @@ body.busy #blocker { display:block; }
 <div id="snap-assist"></div>
 
 <script>
+// ─────────────────────────────────────────────
+// Host / Guest detection
+// ─────────────────────────────────────────────
+// If this page is loaded inside an iframe (window.self !== window.top),
+// it's a "guest" instance — the page that embedded it is the "host" and
+// can send control messages: set-vm-time, set-vm-app, plus everything
+// the Settings app already controls (background, accent, taskbar, etc).
+const isGuest = (function() {
+  try { return window.self !== window.top; } catch (e) { return true; } // cross-origin parent access throws -> still an iframe
+})();
+
+let vmTimeOffsetMs = 0; // ms to add to real time when host overrides the clock
+
+if (isGuest) {
+  // Tell the host we're ready to receive controls
+  try {
+    window.parent.postMessage({ source: '11guest', type: 'guest-ready' }, '*');
+  } catch (e) {}
+}
+
+window.addEventListener('message', e => {
+  if (!e.data || e.data.source !== '11host') return;
+  const { type, payload } = e.data;
+
+  if (type === 'set-vm-time') {
+    // payload.iso: an ISO date string the host wants this guest's clock to show
+    const target = new Date(payload.iso).getTime();
+    vmTimeOffsetMs = target - Date.now();
+    updateClock();
+  }
+  if (type === 'set-vm-background') {
+    shellSettings.bgUrl = payload.url;
+    applyShellSettings();
+  }
+  if (type === 'set-vm-accent') {
+    shellSettings.tbAccentRgb = payload.rgb;
+    applyShellSettings();
+  }
+  if (type === 'set-vm-taskbar-opacity') {
+    shellSettings.tbOpacity = payload.value;
+    applyShellSettings();
+  }
+  if (type === 'set-vm-taskbar-blur') {
+    shellSettings.tbBlur = payload.value;
+    applyShellSettings();
+  }
+  if (type === 'set-vm-dark-mode') {
+    shellSettings.darkMode = payload.enabled;
+    applyDarkMode();
+  }
+  if (type === 'set-vm-animations') {
+    shellSettings.animations = payload.enabled;
+    let style = document.getElementById('anim-override');
+    if (!style) { style = document.createElement('style'); style.id = 'anim-override'; document.head.appendChild(style); }
+    style.textContent = shellSettings.animations ? '' : '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  }
+  if (type === 'open-vm-app') {
+    // payload: { kind: 'url'|'taskhack'|'settings'|'vm', url, title }
+    if (payload.kind === 'url') createWindow(payload.url, payload.title || payload.url, true);
+    if (payload.kind === 'taskhack') openTaskHack();
+    if (payload.kind === 'settings') openSettingsWindow();
+    if (payload.kind === 'vm') openVMWindow();
+  }
+  if (type === 'close-all-windows') {
+    [...windows].forEach(w => closeWindow(w.id, true));
+  }
+});
+
 // ── Clock ──
 function updateClock() {
-  const now = new Date();
+  const now = new Date(Date.now() + vmTimeOffsetMs);
   const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
   const ampm = h >= 12 ? 'PM' : 'AM';
   let time = (h%12||12) + ':' + String(m).padStart(2,'0');
@@ -742,6 +848,7 @@ function updateClock() {
   document.getElementById('clock-date').textContent = (now.getMonth()+1)+'/'+now.getDate()+'/'+now.getFullYear();
 }
 updateClock(); window._clockInterval = setInterval(updateClock, 15000);
+
 
 // ── Network ──
 function updateNet() {
@@ -1497,20 +1604,44 @@ function refreshTaskHack() {
   if (!list) return;
   if (windows.length === 0) {
     list.innerHTML = '<div class="th-empty">No running processes</div>';
+  } else {
+    list.innerHTML = '';
+    windows.forEach(w => {
+      const titleEl = document.getElementById('wt-'+w.id);
+      const name = titleEl ? titleEl.textContent : 'Window '+w.id;
+      const row = document.createElement('div');
+      row.className = 'th-row';
+      row.innerHTML = `
+        <span class="th-row-ico">&#xE774;</span>
+        <span class="th-row-name">${name}</span>
+        <span class="th-row-status">${w.isMinimized ? 'Minimized' : 'Running'}</span>
+        <button class="th-end-btn" data-kill="${w.id}">End</button>`;
+      list.appendChild(row);
+    });
+  }
+  refreshVMList();
+}
+
+function refreshVMList() {
+  const vmList = document.getElementById('th-vm-list');
+  if (!vmList) return;
+  const liveVmIds = vmWindowIds.filter(id => windows.find(w => w.id === id));
+  if (liveVmIds.length === 0) {
+    vmList.innerHTML = '<div class="th-empty">No virtual machines open</div>';
     return;
   }
-  list.innerHTML = '';
-  windows.forEach(w => {
-    const titleEl = document.getElementById('wt-'+w.id);
-    const name = titleEl ? titleEl.textContent : 'Window '+w.id;
+  vmList.innerHTML = '';
+  liveVmIds.forEach(id => {
+    const titleEl = document.getElementById('wt-'+id);
+    const name = titleEl ? titleEl.textContent : 'Virtual Machine';
     const row = document.createElement('div');
     row.className = 'th-row';
     row.innerHTML = `
-      <span class="th-row-ico">&#xE774;</span>
+      <span class="th-row-ico" style="color:#a78bfa;">&#xE7F8;</span>
       <span class="th-row-name">${name}</span>
-      <span class="th-row-status">${w.isMinimized ? 'Minimized' : 'Running'}</span>
-      <button class="th-end-btn" data-kill="${w.id}">End</button>`;
-    list.appendChild(row);
+      <span class="th-row-status">Running</span>
+      <button class="th-end-btn" data-kill="${id}">End</button>`;
+    vmList.appendChild(row);
   });
 }
 
@@ -1575,6 +1706,30 @@ document.addEventListener('click', e => {
   if (e.target.closest('#desk-taskhack')) {
     if (thIsOpen && thWin.classList.contains('show')) closeTaskHack();
     else openTaskHack();
+  }
+
+  // VM: set guest clock
+  if (e.target.id === 'th-vm-time-apply') {
+    const input = document.getElementById('th-vm-datetime');
+    if (input && input.value) {
+      const iso = new Date(input.value).toISOString();
+      sendToVMs('set-vm-time', { iso });
+    }
+    return;
+  }
+
+  // VM: launch an app inside every open VM
+  const vmLaunchBtn = e.target.closest('[data-vmlaunch]');
+  if (vmLaunchBtn) {
+    const kind = vmLaunchBtn.dataset.vmlaunch;
+    sendToVMs('open-vm-app', { kind });
+    return;
+  }
+
+  // VM: close all windows inside every open VM
+  if (e.target.id === 'th-vm-closeall') {
+    sendToVMs('close-all-windows', {});
+    return;
   }
 });
 
@@ -1772,6 +1927,43 @@ function openSettingsWindow() {
   if (titlebarIco) { titlebarIco.textContent = '\uE713'; titlebarIco.style.color = '#0078d4'; }
 }
 
+// ── Virtual Machine icon ──
+// Opens a nested copy of this same desktop in an iframe. Because the nested
+// page detects it's running inside an iframe, it becomes a "guest" and this
+// outer page automatically becomes its "host" — host controls (set-vm-time,
+// set-vm-background, set-vm-app, etc.) are sent down via postMessage.
+const SITE_URL = 'https://robloxluakrnlaccount.github.io/Windows11/';
+let vmWindowIds = []; // supports multiple nested VMs open at once
+
+document.getElementById('desk-vm').addEventListener('click', () => openVMWindow());
+
+function openVMWindow() {
+  const state = createWindow(SITE_URL, 'Virtual Machine', true);
+  vmWindowIds.push(state.id);
+  const pill = document.getElementById('tb-pill-' + state.id);
+  if (pill) pill.querySelector('.tb-app-icon').textContent = '\uE7F8';
+  const titlebarIco = state.el.querySelector('.tb-app-ico');
+  if (titlebarIco) { titlebarIco.textContent = '\uE7F8'; titlebarIco.style.color = '#a78bfa'; }
+}
+
+// Clean up vmWindowIds when a VM window closes
+const _origCloseWindow = closeWindow;
+closeWindow = function(id, instant) {
+  vmWindowIds = vmWindowIds.filter(vid => vid !== id);
+  if (id === settingsWindowId) settingsWindowId = null;
+  return _origCloseWindow(id, instant);
+};
+
+// Send a host-control message to every open nested VM
+function sendToVMs(type, payload) {
+  vmWindowIds.forEach(id => {
+    const frame = document.getElementById('wframe-' + id);
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage({ source: '11host', type, payload }, '*');
+    }
+  });
+}
+
 // ── Shell settings state ──
 var shellSettings = {
   bgUrl: 'https://blogs.windows.com/wp-content/uploads/sites/2/2021/10/Windows-11-Bloom-Screensaver-Dark-scaled.jpg',
@@ -1833,18 +2025,22 @@ window.addEventListener('message', e => {
   if (type === 'set-background') {
     shellSettings.bgUrl = payload.url;
     applyShellSettings();
+    sendToVMs('set-vm-background', payload);
   }
   if (type === 'set-accent') {
     shellSettings.tbAccentRgb = payload.rgb;
     applyShellSettings();
+    sendToVMs('set-vm-accent', payload);
   }
   if (type === 'set-taskbar-opacity') {
     shellSettings.tbOpacity = payload.value;
     applyShellSettings();
+    sendToVMs('set-vm-taskbar-opacity', payload);
   }
   if (type === 'set-taskbar-blur') {
     shellSettings.tbBlur = payload.value;
     applyShellSettings();
+    sendToVMs('set-vm-taskbar-blur', payload);
   }
   if (type === 'set-clock-seconds') {
     shellSettings.clockSeconds = payload.enabled;
@@ -1865,10 +2061,12 @@ window.addEventListener('message', e => {
     let style = document.getElementById('anim-override');
     if (!style) { style = document.createElement('style'); style.id = 'anim-override'; document.head.appendChild(style); }
     style.textContent = shellSettings.animations ? '' : '*, *::before, *::after { transition: none !important; animation: none !important; }';
+    sendToVMs('set-vm-animations', payload);
   }
   if (type === 'set-dark-mode') {
     shellSettings.darkMode = payload.enabled;
     applyDarkMode();
+    sendToVMs('set-vm-dark-mode', payload);
   }
 });
 
