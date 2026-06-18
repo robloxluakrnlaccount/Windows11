@@ -214,6 +214,50 @@ html.shell-dark .papp-btn.cancel:hover { background: #333; }
 
 /* ── Window content ── */
 .wcontent { flex: 1; overflow: hidden; position: relative; border-radius: 0 0 8px 8px; }
+
+/* ── VM toolbar ── */
+.vm-toolbar {
+  display: flex; align-items: center; gap: 6px;
+  height: 38px; min-height: 38px; flex-shrink: 0;
+  background: #1f1f1f; border-bottom: 1px solid #333;
+  padding: 0 8px; overflow-x: auto; overflow-y: hidden;
+  font-family: 'Segoe UI VF', system-ui, sans-serif;
+}
+.vm-toolbar::-webkit-scrollbar { height: 4px; }
+.vm-toolbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.vm-tb-btn {
+  display: flex; align-items: center; gap: 5px;
+  height: 28px; padding: 0 10px; border-radius: 5px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.85); font-size: 11.5px; cursor: pointer;
+  white-space: nowrap; flex-shrink: 0; transition: background 0.1s, border-color 0.1s;
+}
+.vm-tb-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
+.vm-tb-btn:active { background: rgba(255,255,255,0.18); }
+.vm-tb-btn.danger { color: #f87171; border-color: rgba(248,113,113,0.3); }
+.vm-tb-btn.danger:hover { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.5); }
+.vm-tb-ico { font-family: 'Segoe Fluent Icons', sans-serif; font-size: 13px; flex-shrink: 0; }
+.vm-tb-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.12); flex-shrink: 0; margin: 0 2px; }
+.vm-tb-input {
+  height: 28px; border-radius: 5px; padding: 0 9px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  color: #eee; font-size: 11.5px; font-family: 'Segoe UI VF', system-ui, sans-serif;
+  outline: none; flex-shrink: 0; transition: border-color 0.1s;
+}
+.vm-tb-input:focus { border-color: #0078d4; }
+.vm-tb-input.url { width: 220px; }
+.vm-tb-input.dt { width: 168px; color-scheme: dark; }
+.vm-tb-label { font-size: 10.5px; color: rgba(255,255,255,0.45); flex-shrink: 0; white-space: nowrap; }
+.vm-tb-popover {
+  position: absolute; top: 100%; left: 0; margin-top: 4px;
+  background: #242424; border: 1px solid #3a3a3a; border-radius: 8px;
+  padding: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  z-index: 50; display: none; flex-direction: column; gap: 8px;
+  min-width: 220px;
+}
+.vm-tb-popover.show { display: flex; }
+.vm-tb-popover-title { font-size: 10.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.vm-tb-btn-wrap { position: relative; }
 .wcontent iframe { width: 100%; height: 100%; border: none; display: block; }
 
 /* ── Resize handles ── */
@@ -1091,7 +1135,7 @@ function snapFlyoutHTML(id) {
   </div>`;
 }
 
-function createWindow(src, title, isUrl) {
+function createWindow(src, title, isUrl, isVM) {
   const id = nextId++;
   const vw = window.innerWidth, vh = window.innerHeight - TASKBAR_H;
   const isMobile = vw < 600;
@@ -1105,6 +1149,37 @@ function createWindow(src, title, isUrl) {
   el.id = 'win-'+id;
   el.style.cssText = `left:${l}px;top:${t}px;width:${W}px;height:${H}px;`;
   if (isMobile) { el.style.borderRadius = '0'; el.classList.add('maximized'); }
+
+  const vmToolbarHTML = isVM ? `
+    <div class="vm-toolbar" data-vmtb="${id}">
+      <div class="vm-tb-btn-wrap">
+        <button class="vm-tb-btn" data-vmpop="clock-${id}"><span class="vm-tb-ico">&#xE916;</span>Clock</button>
+        <div class="vm-tb-popover" id="vmpop-clock-${id}">
+          <div class="vm-tb-popover-title">Set guest clock</div>
+          <input type="datetime-local" class="vm-tb-input dt" id="vmtb-datetime-${id}" style="width:100%;">
+          <div style="display:flex; gap:6px;">
+            <button class="vm-tb-btn" style="flex:1; justify-content:center;" data-vmaction="settime" data-wid="${id}">Apply</button>
+            <button class="vm-tb-btn" style="flex:1; justify-content:center;" data-vmaction="resettime" data-wid="${id}">Real time</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="vm-tb-sep"></div>
+
+      <input type="text" class="vm-tb-input url" id="vmtb-url-${id}" placeholder="Open a website in this VM…">
+      <button class="vm-tb-btn" data-vmaction="openurl" data-wid="${id}"><span class="vm-tb-ico">&#xE774;</span>Go</button>
+
+      <div class="vm-tb-sep"></div>
+
+      <button class="vm-tb-btn" data-vmaction="launch" data-vmkind="taskhack" data-wid="${id}"><span class="vm-tb-ico" style="color:#f87171;">&#xE81E;</span>Task Hack</button>
+      <button class="vm-tb-btn" data-vmaction="launch" data-vmkind="settings" data-wid="${id}"><span class="vm-tb-ico" style="color:#60cdff;">&#xE713;</span>Settings</button>
+      <button class="vm-tb-btn" data-vmaction="launch" data-vmkind="vm" data-wid="${id}"><span class="vm-tb-ico" style="color:#a78bfa;">&#xE7F8;</span>Nested VM</button>
+
+      <div class="vm-tb-sep"></div>
+
+      <button class="vm-tb-btn danger" data-vmaction="closeall" data-wid="${id}"><span class="vm-tb-ico">&#xE74D;</span>Close all windows</button>
+      <button class="vm-tb-btn" data-vmaction="reload" data-wid="${id}"><span class="vm-tb-ico">&#xE72C;</span>Reload VM</button>
+    </div>` : '';
 
   el.innerHTML = `
     <div class="rh rh-n" data-dir="n" data-wid="${id}"></div><div class="rh rh-s" data-dir="s" data-wid="${id}"></div>
@@ -1120,11 +1195,12 @@ function createWindow(src, title, isUrl) {
         <button class="wbtn wclose" data-wid="${id}" title="Close"><span class="wbtn-ico">&#xE8BB;</span></button>
       </div>
     </div>
+    ${vmToolbarHTML}
     <div class="wcontent"><iframe id="wframe-${id}" src="${src}" title="${title}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe></div>`;
 
   document.getElementById('desktop').appendChild(el);
 
-  const state = { id, el, isMaximized: isMobile, preMax: null, isMinimized: false };
+  const state = { id, el, isMaximized: isMobile, preMax: null, isMinimized: false, isVM: !!isVM };
   if (isMobile) state.preMax = { left:0, top:0, width:vw, height:vh };
   windows.push(state);
 
@@ -1353,9 +1429,67 @@ document.addEventListener('click', e => {
   // Controller mode picker
   if (e.target.closest('#ctrl-opt-cursor')) { setControllerMode('cursor'); return; }
   if (e.target.closest('#ctrl-opt-select')) { setControllerMode('select'); return; }
+
+  // ── VM toolbar ──
+  const vmPopTrigger = e.target.closest('[data-vmpop]');
+  if (vmPopTrigger) {
+    const popId = vmPopTrigger.dataset.vmpop;
+    const pop = document.getElementById('vmpop-' + popId);
+    const wasOpen = pop.classList.contains('show');
+    document.querySelectorAll('.vm-tb-popover.show').forEach(p => p.classList.remove('show'));
+    if (!wasOpen) pop.classList.add('show');
+    return;
+  }
+  // Click elsewhere closes any open popover (unless clicking inside one)
+  if (!e.target.closest('.vm-tb-popover')) {
+    document.querySelectorAll('.vm-tb-popover.show').forEach(p => p.classList.remove('show'));
+  }
+
+  const vmAction = e.target.closest('[data-vmaction]');
+  if (vmAction) {
+    const wid = parseInt(vmAction.dataset.wid);
+    const action = vmAction.dataset.vmaction;
+
+    if (action === 'settime') {
+      const input = document.getElementById('vmtb-datetime-' + wid);
+      if (input && input.value) {
+        const iso = new Date(input.value).toISOString();
+        sendToVM(wid, 'set-vm-time', { iso });
+      }
+      document.getElementById('vmpop-clock-' + wid)?.classList.remove('show');
+    }
+    if (action === 'resettime') {
+      sendToVM(wid, 'set-vm-time', { iso: new Date().toISOString() });
+      document.getElementById('vmpop-clock-' + wid)?.classList.remove('show');
+    }
+    if (action === 'openurl') {
+      const input = document.getElementById('vmtb-url-' + wid);
+      let url = (input?.value || '').trim();
+      if (url) {
+        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+        sendToVM(wid, 'open-vm-app', { kind: 'url', url, title: url });
+        input.value = '';
+      }
+    }
+    if (action === 'launch') {
+      sendToVM(wid, 'open-vm-app', { kind: vmAction.dataset.vmkind });
+    }
+    if (action === 'closeall') {
+      sendToVM(wid, 'close-all-windows', {});
+    }
+    if (action === 'reload') {
+      const frame = document.getElementById('wframe-' + wid);
+      if (frame) frame.src = frame.src;
+    }
+    return;
+  }
 }, true);
 
 document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('vmtb-url-')) {
+    const wid = e.target.id.replace('vmtb-url-', '');
+    document.querySelector(`[data-vmaction="openurl"][data-wid="${wid}"]`)?.click();
+  }
   if (e.key === 'Enter' && e.target.classList.contains('papp-urlinput')) {
     const pid = e.target.id.replace('purl-','');
     pickerDoOpen(parseInt(pid));
@@ -1938,7 +2072,7 @@ let vmWindowIds = []; // supports multiple nested VMs open at once
 document.getElementById('desk-vm').addEventListener('click', () => openVMWindow());
 
 function openVMWindow() {
-  const state = createWindow(SITE_URL, 'Virtual Machine', true);
+  const state = createWindow(SITE_URL, 'Virtual Machine', true, true);
   vmWindowIds.push(state.id);
   const pill = document.getElementById('tb-pill-' + state.id);
   if (pill) pill.querySelector('.tb-app-icon').textContent = '\uE7F8';
@@ -1956,12 +2090,14 @@ closeWindow = function(id, instant) {
 
 // Send a host-control message to every open nested VM
 function sendToVMs(type, payload) {
-  vmWindowIds.forEach(id => {
-    const frame = document.getElementById('wframe-' + id);
-    if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage({ source: '11host', type, payload }, '*');
-    }
-  });
+  vmWindowIds.forEach(id => sendToVM(id, type, payload));
+}
+
+function sendToVM(id, type, payload) {
+  const frame = document.getElementById('wframe-' + id);
+  if (frame && frame.contentWindow) {
+    frame.contentWindow.postMessage({ source: '11host', type, payload }, '*');
+  }
 }
 
 // ── Shell settings state ──
